@@ -1,0 +1,1497 @@
+#+TITLE: Note for Learning Org Mode
+#+LANGUAGE: en
+#+AUTHOR: CuriousBull
+#+EMAIL: curiousbull@163.com
+#+OPTIONS: H:3 num:t tot:3 #\n:nil @:t ::t |:t ^:nil -:t f:t *:t <:nil
+#+OPTIONS: TeX:t LaTeX:nil skip:nil d:nil todo:nil pri:nil tags:not-in-toc
+#+OPTIONS: author:t creator:t timestamp:t email:t
+#+DESCRIPTION: A note for learing to use org-mode
+#+KEYWORDS:  org-mode Emacs organization GTD getting-things-done git
+
+这篇文档主要根据 Bernt Hansen 的文章 [[http://doc.norang.ca/org-mode.html][Org Mode - Organize Your Life In Plain Text!]] 所做读书笔记，基本
+配置则基于 =spacemacs= 上的 =org layer= 做了如文中所述的大部分修改。修改后的 =spacemacs= 配置保存在
+我个人的 [[https://github.com/CuriousBull/spacemacs][github 仓库]]。
+
+* 开始 (Getting Started)
+** DONE 利用 =Org= 文件组织你的生活 (Organizing Your Life Into Org Files)
+CLOSED: [2015-10-27 二 16:03]
+:PROPERTIES:
+:CUSTOM_ID: OrgFilesOrganizeLife
+:END:
+:LOGBOOK:
+CLOCK: [2015-10-27 二 15:27]--[2015-10-27 二 15:53] =>  0:26
+:END:
+
+事务可以分割为逻辑上的组或者项目。而大型的事务组和子目录的信息则可以用不同的 =org= 文件来记录。以下
+表格是一种分割方式的示例：
+
+#+CAPTION: Bernt Hansen 组织生活的 =org= 文件组织方式(非工作)
+#+LABEL: table1
+| Filename             | Description                                                                |
+|----------------------+----------------------------------------------------------------------------|
+| <20>                 | <74>                                                                       |
+| todo.org             | Personal tasks and things to keep track of                                 |
+| gsoc2009.org         | Google Summer of Code stuff for 2009                                       |
+| farm.org             | Farm related tasks                                                         |
+| mark.org             | Tasks related to my son Mark                                               |
+| git.org              | Git related tasks                                                          |
+
+#+CAPTION: Bernt Hansen 组织生活的 =org= 文件组织方式(快照笔记和事务等)
+#+LABEL: table2
+| Filename             | Description                                                                |
+|----------------------+----------------------------------------------------------------------------|
+| <20>                 | <74>                                                                       |
+| refile.org           | Capture task bucket                                                        |
+
+#+CAPTION: Bernt Hansen 组织生活的 =org= 文件组织方式(快照笔记和事务等)
+#+LABEL: tbl:table3
+| Filename             | Description                                                                |
+|----------------------+----------------------------------------------------------------------------|
+| <20>                 | <74>                                                                       |
+| norang.org           | Norang tasks and notes                                                     |
+| XYZ.org              | XYZ Corp tasks and notes                                                   |
+| ABC.org              | ABC Ltd tasks                                                              |
+| ABC-DEF.org          | ABC Ltd tasks for their client DEF Corp                                    |
+| ABC-KKK.org          | ABC Ltd tasks for their client KKK Inc                                     |
+| YYY.org              | YYY Inc tasks                                                              |
+
+如上所示的组织方式，对于个人事务的组织会显得井井有条。\ref{table3} 中将 ABC 公司的不同客户用不同的 =org= 文
+件进行了分割。
+
+** DONE 日程设置 (Agenda Setup)
+CLOSED: [2015-10-27 二 16:28]
+:PROPERTIES:
+:CUSTUM_ID: AgendaSetup
+:END:
+:LOGBOOK:
+- State "NEXT"       from "WAITING"    [2015-10-27 二 16:25]
+- State "WAITING"    from "NEXT"       [2015-10-27 二 16:08] \\
+  Need to go to toilet
+CLOCK: [2015-10-27 二 16:05]--[2015-10-27 二 16:28] =>  0:23
+:END:
+
+可以设置一个目录用来存放个人的日程文件，以下是一种目录设置方式：
+
+#+begin_src emacs-lisp
+(setq org-agenda-files (quote ("~/git/org"
+                               "~/git/org/client1"
+                               "~/git/clients")))
+#+end_src
+
+上面的目录设置方式主要按照以下思路：在 =~/git/org= 中方法一般的 =org= 文件，在 =~/git/org/clinet1= 
+则存放客户资料，在 =~/git/client2= 则存放个人隐私的一些信息，这样，可以在不同场合选择是否同步该文件
+夹的内容。
+
+** DONE =Org= 文件的结构 (Org File Structure)
+CLOSED: [2015-10-28 三 09:09]
+:PROPERTIES:
+:CUSTUM_ID: OrgFileStructure
+:END:
+:LOGBOOK:
+CLOCK: [2015-11-03 二 14:33]--[2015-11-03 二 14:40] =>  0:07
+CLOCK: [2015-10-28 三 08:47]--[2015-10-28 三 09:01] =>  0:14
+:END:
+
+通常 org 文件可以用 1 级标题作为分类( =category= )，然后个人事务和项目[fn:1] (projects) 则列在二级标题下。下面是一个例子：
+
+=todo.org=
+
+- Special Dates
+
+  Includes level 2 headings force
+  
+  - Birthdays
+
+  - Anniversaries
+
+  - Holidays
+
+- Finances
+- Health and Recreation
+- House Maintenance
+- Lawn and Garden Maintenance
+- Notes
+- Tasks
+- Vehicle Maintenances
+- Passwords
+
+=norang.org=
+
+- System Maintenances
+- Payroll
+- Accounting
+- Finances
+- Hardware Maintenances
+- Tasks
+- Research and Development
+- Notes
+- Purchase Order Tracking
+- Passwords
+
+通常其中每个 1 级事务会被设置一个属性抽屉( =property drawer= ), 可以用来说明树 (Tree) 中该分类下的事
+务共性。1 级标题通常会设置成如下样子：
+
+#+begin_src org :exports src
+,* Health and Recreation
+:PROPERTIES:
+:CATEGORY: Health
+:END:
+...
+,* House Maintenance
+:PROPERTIES:
+:CATEGORY: House
+:END:
+#+end_src
+** DONE 键位设置
+CLOSED: [2015-10-28 三 14:23]
+:LOGBOOK:
+CLOCK: [2015-10-28 三 14:21]--[2015-10-28 三 14:23] =>  0:02
+CLOCK: [2015-10-28 三 11:35]--[2015-10-28 三 12:00] =>  0:25
+- State "NEXT"       from "WAITING"    [2015-10-28 三 11:34]
+- State "WAITING"    from "MEETING"    [2015-10-28 三 09:13] \\
+  pomodoro waiting time and soon there will be a meeting of Jialun's students
+CLOCK: [2015-10-28 三 09:10]--[2015-10-28 三 09:12] =>  0:02
+:END:
+
+一个比较方便的键位绑定设置如下[fn:2]:
+
+| Key     | For                                             | Used       |
+|---------+-------------------------------------------------+------------|
+| F12     | Agenda(1 key less than C-c a)                   | Very often |
+| C-c b   | Switch to org file                              | Very often |
+| F11     | Goto currently clocked item                     | Very often |
+| C-c c   | Capture a task                                  | Very often |
+| F9 g    | Gnus - I check mail regularly                   | Often      |
+| F5      | Show todo items for this subtree                | Often      |
+| S-F5    | Widen                                           | Often      |
+| F9 b    | Quick access to bbdb data                       | Often      |
+| F9 c    | Calendar access                                 | Often      |
+| C-S-F12 | Save buffers and publish current project        | Often      |
+| C-c l   | Store a link for retrieval with C-c C-l         | Often      |
+| F8      | Go to next org file in org-agenda-file          | Sometimes  |
+| F9 r    | Boxquote selected region                        | Sometimes  |
+| F9 t    | Insert inactive timestamp                       | Sometimes  |
+| F9 v    | Toggle visible mode (for showing/editing links) | Sometimes  |
+| C-F9    | Previous buffer                                 | Sometimes  |
+| C-F10   | Next buffer                                     | Sometimes  |
+| C-x n r | Narrow to region                                | Sometimes  |
+| F9 f    | Boxquote insert a file                          | Sometimes  |
+| F9 i    | Info manual                                     | Sometimes  |
+| F9 I    | Punch Clock In                                  | Sometimes  |
+| F9 O    | Punch Clock Out                                 | Sometimes  |
+| F9 o    | Swith to org scratch buffer                     | Sometimes  |
+| F9 s    | Switch to scratch buffer                        | Sometimes  |
+| F9 h    | Hide other tasks                                | Rare       |
+| F7      | Toggle line truncation/wrap                     | Rare       |
+| F9 T    | Toggle insert inactive timestamp                | Rare       |
+| C-c a   | Enter Agenda (minimal emacs testing)            | Rare       |
+
+键位设置的 =lisp= 配置代码如下:
+#+header: :tangle yes
+#+begin_src emacs-lisp
+;; Custom Key Bindings
+(global-set-key (kbd "<f12>") 'org-agenda)
+(global-set-key (kbd "<f5>") 'bh/org-todo)
+(global-set-key (kbd "<S-f5>") 'bh/widen)
+(global-set-key (kbd "<f7>") 'bh/set-truncate-lines)
+(global-set-key (kbd "<f8>") 'org-cycle-agenda-files)
+(global-set-key (kbd "<f9> <f9>") 'bh/show-org-agenda)
+(global-set-key (kbd "<f9> b") 'bbdb)
+(global-set-key (kbd "<f9> c") 'calendar)
+(global-set-key (kbd "<f9> f") 'boxquote-insert-file)
+(global-set-key (kbd "<f9> g") 'gnus)
+(global-set-key (kbd "<f9> h") 'bh/hide-other)
+(global-set-key (kbd "<f9> n") 'bh/toggle-next-task-display)
+
+(global-set-key (kbd "<f9> I") 'bh/punch-in)
+(global-set-key (kbd "<f9> O") 'bh/punch-out)
+
+(global-set-key (kbd "<f9> o") 'bh/make-org-scratch)
+
+(global-set-key (kbd "<f9> r") 'boxquote-region)
+(global-set-key (kbd "<f9> s") 'bh/switch-to-scratch)
+
+(global-set-key (kbd "<f9> t") 'bh/insert-inactive-timestamp)
+(global-set-key (kbd "<f9> T") 'bh/toggle-insert-inactive-timestamp)
+
+(global-set-key (kbd "<f9> v") 'visible-mode)
+(global-set-key (kbd "<f9> l") 'org-toggle-link-display)
+(global-set-key (kbd "<f9> SPC") 'bh/clock-in-last-task)
+(global-set-key (kbd "C-<f9>") 'previous-buffer)
+(global-set-key (kbd "M-<f9>") 'org-toggle-inline-images)
+(global-set-key (kbd "C-x n r") 'narrow-to-region)
+(global-set-key (kbd "C-<f10>") 'next-buffer)
+(global-set-key (kbd "<f11>") 'org-clock-goto)
+(global-set-key (kbd "C-<f11>") 'org-clock-in)
+(global-set-key (kbd "C-s-<f12>") 'bh/save-then-publish)
+(global-set-key (kbd "C-c c") 'org-capture)
+
+(defun bh/hide-other ()
+  (interactive)
+  (save-excursion
+    (org-back-to-heading 'invisible-ok)
+    (hide-other)
+    (org-cycle)
+    (org-cycle)
+    (org-cycle)))
+
+(defun bh/set-truncate-lines ()
+  "Toggle value of truncate-lines and refresh window display."
+  (interactive)
+  (setq truncate-lines (not truncate-lines))
+  ;; now refresh window display (an idiom from simple.el):
+  (save-excursion
+    (set-window-start (selected-window)
+                      (window-start (selected-window)))))
+
+(defun bh/make-org-scratch ()
+  (interactive)
+  (find-file "/tmp/publish/scratch.org")
+  (gnus-make-directory "/tmp/publish"))
+
+(defun bh/switch-to-scratch ()
+  (interactive)
+  (switch-to-buffer "*scratch*"))
+#+end_src
+* 事务和状态
+=Emacs= 的 =org-mode= 默认的事务状态只有两个 =TODO= 和 =DONE= , 而实际我们处理的事务可能用这两个简单
+的状态描述符显得不够. 因此, 方便起见, 我们可以配置一个全局可用的 =todo=[fn:3] 关键词列表. 
+** DONE =todo= 关键词 (TODO Keywords)
+CLOSED: [2015-10-28 三 14:36]
+:PROPERTY:
+:CUSTUM_ID: TODOKeywords
+:LOGBOOK:
+CLOCK: [2015-10-28 三 14:29]--[2015-10-28 三 14:36] =>  0:07
+:END:
+
+Bernt Hansen 的关键词设定一般就够了, 配置脚本如下, 当然, 如果读者还需要更多状态关键词, 完全可以仿照下
+面的脚本自己写出一个状态关键词来. 
+
+#+header: :tangle yes
+#+begin_src emacs-lisp
+(setq org-todo-keywords
+      (quote ((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d)")
+              (sequence "WAITING(w@/!)" "HOLD(h@/!)" "|" "CANCELLED(c@/!)" "PHONE" "MEETING"))))
+
+(setq org-todo-keyword-faces
+      (quote (("TODO" :foreground "red" :weight bold)
+              ("NEXT" :foreground "blue" :weight bold)
+              ("DONE" :foreground "forest green" :weight bold)
+              ("WAITING" :foreground "orange" :weight bold)
+              ("HOLD" :foreground "magenta" :weight bold)
+              ("CANCELLED" :foreground "forest green" :weight bold)
+              ("MEETING" :foreground "forest green" :weight bold)
+              ("PHONE" :foreground "forest green" :weight bold))))
+#+end_src
+*** DONE 事务状态 (Task States)
+CLOSED: [2015-10-28 三 19:42]
+:PROPERTIES:
+:CUSTOM_ID: TodoKeywordTasksStates
+:END:
+:LOGBOOK:
+CLOCK: [2015-10-28 三 19:19]--[2015-10-28 三 19:42] =>  0:23
+CLOCK: [2015-10-28 三 14:37]--[2015-10-28 三 16:51] =>  2:14
+:END:
+
+下面的图表则展示了事务状态之间的转变关系:
+
+#+begin_src plantuml :file normal_tast_states.png :cache yes
+title Tast States
+[*] -> TODO
+TODO -> NEXT
+TODO -> DONE
+NEXT -> DONE
+DONE -> [*]
+TODO --> WAITING
+WAITING --> TODO
+NEXT --> WAITING
+WAITING --> NEXT
+HOLD --> CANCELLED
+WAITING --> CANCELLED
+CANCELLED --> [*]
+TODO --> HOLD
+HOLD --> TODO
+TODO --> CANCELLED
+TODO: t
+NEXT: n
+DONE: d
+WAITING: d
+note right of WAITING: Note records\nwhat it is waiting for
+HOLD: h
+note right of CANCELLED: Note records\nwhy it was cancelled
+CANCELLED: c
+WAITING --> DONE
+#+end_src
+
+#+results:
+[[file:normal_tast_states.png]]
+
+*** DONE 项目事务状态 (Project Task States)
+:PROPERTIES: 
+:CUSTUM_ID: TodoKeywordProjectTaskStates
+:END:
+CLOSED: [2015-10-28 三 19:55]
+:LOGBOOK:
+CLOCK: [2015-10-28 三 19:49]--[2015-10-28 三 19:55] =>  0:06
+- State "NEXT"       from "WAITING"    [2015-10-28 三 19:49]
+- State "WAITING"    from "NEXT"       [2015-10-28 三 19:44] \\
+  Pomodoro waiting time
+CLOCK: [2015-10-28 三 19:43]--[2015-10-28 三 19:44] =>  0:01
+:END:
+
+项目 ( =project= ) 和事务 ( =task= ) 的区分, 一个比较懒而有用的定义如下: 如果一个事务有至少有一
+个带 =todo= 关键词的子事务，那么就认为该事务为一个项目。
+
+任意级别下都可以定义 =project= -- 只需要给项目创建一个带有 =todo= 关键词子事务即可。项目的 =todo= 关
+键词与普通事务定义一样. 需要注意的是, 一个项目至少需要有一个的状态为 =NEXT= 的子事务, 这样该项目就不
+会被认为处于卡住 ( =stuck= ) 的状态。
+*** DONE 电话事务 (Phone Calls)
+CLOSED: [2015-10-28 三 20:14]
+:PROPERTIES:
+:CUSTOM_ID: TodoKeywordPhoneCalls
+:END:
+:LOGBOOK:
+CLOCK: [2015-10-28 三 20:04]--[2015-10-28 三 20:14] =>  0:10
+CLOCK: [2015-10-28 三 20:00]--[2015-10-28 三 20:03] =>  0:03
+CLOCK: [2015-10-28 三 19:56]--[2015-10-28 三 19:58] =>  0:02
+:END:
+
+电话事务处理方式比较特殊. 电话事务被处理成一个处于完成状态 ( =done state= ) 的快照事务[fn:4]. 当快照 
+任务处于活动 ( =active= ) 状态时, 电话时间就会被记录下来. 打电话的时候, 经常会出现这种情况, 就是我们
+一边接着电话, 一边又需要查点东西或者做点别的事情, 这时候, 关闭处于活动状态的电话快照事务, 会打断电话
+事务的计时, 而这不是我们需要的, 我们希望电话计时继续. 很简单, =C-c C-c= 关闭电话快照事务, =F9 SPC= 
+或者 =C-c C-x C-x= 继续之前任务的计时, 而这, 正是我们的电话快照任务. 于是, 电话快照任务计时继续, 你
+可以放心大胆地干别的事情, 待电话结束, (⊙o⊙)…, 作者没讲, 我的测试嘛, =C-c C-x C-o= 或者 =SPC m O= 
+(=spacemacs= 快捷键) 停止计时就完了嘛, 嘿嘿. 
+#+begin_src plantuml :file phone_states.png :cache yes
+title Phone Call Task State
+[*] -> PHONE
+PHONE -> [*]
+#+end_src
+
+#+results:
+[[file:phone_states.png]]
+*** DONE 会议 (Meetings)
+CLOSED: [2015-10-28 三 20:27]
+:PROPERTIES:
+:CUSTUM_ID: TodoKeywordMeeting
+:END:
+:LOGBOOK:
+- State "NEXT"       from "WAITING"    [2015-10-28 三 20:20]
+- State "WAITING"    from "NEXT"       [2015-10-28 三 20:15] \\
+  pomodoro rest time
+:END:
+
+整别的没啥用, 其实就是和电话事务一样一样的, 嘿嘿, 不过可能需要多记录些会议内容罢了. 
+
+#+begin_src plantuml :file meeting_states.png :cache yes
+title Meeting Task State
+[*] -> MEETING
+MEETING -> [*]
+#+end_src
+
+#+results:
+[[file:meeting_states.png]]
+** DONE 快速的 =todo= 状态切换 (Fast Todo Selection)
+CLOSED: [2015-10-28 三 20:37]
+:PROPERTIES:
+:CUSTOM_ID: FastTodoSelection
+:END:
+:LOGBOOK:
+CLOCK: [2015-10-28 三 20:28]--[2015-10-28 三 20:37] =>  0:09
+:END:
+
+快捷键 =C-c C-t KEY= 可以让我们将当前标题从某一状态迅速跳转到另外任意一个状态, 其中 =KEY= 指的是在敲
+击快捷键 =C-c C-t= 后弹出的状态提示缓冲区中, 对不同 =todo= 状态的选择键. 同时, 将光标置于标题上时,
+我们还可以通过 =S-LEFT= 和 =S-RIGHT= 来依次改变标题的状态 (不包括设置时间戳和进入笔记的状态).
+
+#+header: :tangle yes
+#+begin_src emacs-lisp
+(setq org-use-fast-todo-selection t)
+#+end_src
+
+#+header: :tangle yes
+#+begin_src emacs-lisp
+(setq org-treat-S-cursor-todo-selection-as-state-change nil)
+#+end_src
+** DONE =todo= 状态触发 (TODO state triggers)
+CLOSED: [2015-10-28 三 20:45]
+:PROPERTIES:
+:CUSTUM_ID: TodoTrigger
+:END:
+:LOGBOOK:
+CLOCK: [2015-10-28 三 20:37]--[2015-10-28 三 20:45] =>  0:08
+:END:
+
+当对标题设置状态的时候, 自动给标题设置一个 =tag= 会非常方便, 这样在日程表中可以很方便对事务进行过滤.
+沿用原作者的配置:
+
+- 将任务切换为 =CANCELLED= 状态, 会自动给标题添加 =CANCELLED= 标签
+- 将任务切换为 =WAITING= 状态, 会自动给标题添加 =WAITING= 标签
+- 将任务切换为 =HOLD= 状态, 会自动给标题添加 =WAITING= 和 =HOLD= 标签
+- 将任务切换为 =DONE= 状态, 会自动给标题移除 =WAITING= 和 =HOLD= 标签
+- 将任务切换为 =TODO= 状态, 会自动给标题移除 =WAITING= , =CANCELLED= 和 =HOLD= 标签
+- 将任务切换为 =NEXT= 状态, 会自动给标题移除 =WAITING= , =CANCELLED= 和 =HOLD= 标签
+- 将任务切换为 =DONE= 状态, 会自动给标题移除 =WAITING= , =CANCELLED= 和 =HOLD= 标签
+
+#+header: :tangle yes
+#+begin_src emacs-lisp 
+(setq org-todo-state-tags-triggers
+      (quote (("CANCELLED" ("CANCELLED" . t))
+              ("WAITING" ("WAITING" . t))
+              ("HOLD" ("WAITING") ("HOLD" . t))
+              (done ("WAITING") ("HOLD"))
+              ("TODO" ("WAITING") ("CANCELLED") ("HOLD"))
+              ("NEXT" ("WAITING") ("CANCELLED") ("HOLD"))
+              ("DONE" ("WAITING") ("CANCELLED") ("HOLD")))))
+#+end_src
+* 利用 =Org= 快照功能快速添加新事务 (Adding New Tasks Quickly with Org Capture)
+我们经常会遇到这种情况, 正工作着, 突然来了一个灵感, 或者突然想起需要干某件事情, 但是同时我们又不希望
+失去对于当前工作的关注度. 但是, 灵感之类的东东, 有时候还是挺重要的, 以后有空的时候当然希望还能去处理
+这些灵感啦, 小事务啦之类的. =Org-mode= 恰好有个功能很适合这种情况, 即快照模式 (=capture mode=). 当处
+于工作时, 来灵感了, 简单, =C-c c= 或者 =SPC m c= (=Spacemacs= 快捷键) 就可以创建快照事务. 快速写好灵
+感或者其他事务的概览, 然后回到当前工作, =C-c C-c= , 这样, 快照任务记录下你的灵感, 并会将其存放在某一
+个地方, 文本设置为 =refile.org= 文件统一存放快照事务, 而你可以放心的干当心的事情. 当前事情完成后, 可
+以在去处理那些突发的灵感或者小事务 (本文称这种处理快照事务方式为 =refile=).
+** 快照模板 (Capture Templates)
+
+当然了, 快照事务的模板如果只用默认的那一套的话, 当然会显得不够. 于是, 自定义一套对应各种情况的模板就
+可以啦: 
+
+- A phone call (p)
+- A meeting (m)
+- An email I need to respond to (r)
+- A new task (t)
+- A new note (n)
+- An interruption (j)
+- A new habit (h)
+
+配置模板的 =lisp= 代码如下:
+
+#+header: tangle yes
+#+begin_src emacs-lisp
+(setq org-directory "~/git/org")
+(setq org-default-notes-file "~/git/org/refile.org")
+
+;; I use C-c c to start capture mode
+(global-set-key (kbd "C-c c") 'org-capture)
+
+;; Capture templates for: TODO tasks, Notes, appointments, phone calls, meetings, and org-protocol
+(setq org-capture-templates
+      (quote (("t" "todo" entry (file "~/git/org/refile.org")
+               "* TODO %?\n%U\n%a\n" :clock-in t :clock-resume t)
+              ("r" "respond" entry (file "~/git/org/refile.org")
+               "* NEXT Respond to %:from on %:subject\nSCHEDULED: %t\n%U\n%a\n" :clock-in t :clock-resume t :immediate-finish t)
+              ("n" "note" entry (file "~/git/org/refile.org")
+               "* %? :NOTE:\n%U\n%a\n" :clock-in t :clock-resume t)
+              ("j" "Journal" entry (file+datetree "~/git/org/diary.org")
+               "* %?\n%U\n" :clock-in t :clock-resume t)
+              ("w" "org-protocol" entry (file "~/git/org/refile.org")
+               "* TODO Review %c\n%U\n" :immediate-finish t)
+              ("m" "Meeting" entry (file "~/git/org/refile.org")
+               "* MEETING with %? :MEETING:\n%U" :clock-in t :clock-resume t)
+              ("p" "Phone call" entry (file "~/git/org/refile.org")
+               "* PHONE %? :PHONE:\n%U" :clock-in t :clock-resume t)
+              ("h" "Habit" entry (file "~/git/org/refile.org")
+               "* NEXT %?\n%U\n%a\nSCHEDULED: %(format-time-string \"%<<%Y-%m-%d %a .+1d/3d>>\")\n:PROPERTIES:\n:STYLE: habit\n:REPEAT_TO_STATE: NEXT\n:END:\n"))))
+#+end_src
+
+当然, 仅仅创建模板还不够, 我们当然不希望丢失对于创建快照模板的时间管理, 譬如上面讲的对于电话事务的处
+理, 不仅简单创建一个电话快照事务, 我们希望记录下快照事务的时间. 用以下的配置, 完全可以实现这种功能.
+当创建快照模板后, 光标会进入快照缓冲区中, 这时, 时钟会启动计时 =:clock in= , 快照事务处理结束后, 
+=C-c C-c= 保存快照事务, 快照事务中的时钟会关闭计时 =:clock out= , 并将时间记录放在快照事务的属性抽屉
+中 (:LOGBOOK:), 同时, 快照事务也会被存放在 =refile.org= 文件中. 大部分快照事务时间会很短, 持续时间甚
+至小于 1 分钟, 管理这种短间隔没有什么意义, 因此可以设置自动移除持续时间短于 1 分钟的快照事务的属性抽屉中
+的 =:LOGBOOK= .
+
+#+begin_src org :export src
+,* TODO New Capture Task
+  :LOGBOOK:
+  :END:
+  [2010-05-08 Sat 13:53]
+#+end_src
+
+#+header: :tangle yes
+#+begin_src emacs-lisp
+;; Remove empty LOGBOOK drawers on clock out
+(defun bh/remove-empty-drawer-on-clock-out ()
+  (interactive)
+  (save-excursion
+    (beginning-of-line 0)
+    (org-remove-empty-drawer-at "LOGBOOK" （point）)))
+
+(add-hook 'org-clock-out-hook 'bh/remove-empty-drawer-on-clock-out 'append)
+#+end_src
+** 不同文件存放快照事务 (Separate File for Capture Tasks)
+
+为了快速简单地将快照事务记录下来, 建议将所有的快照存放在同一个的文件, 譬如 =refile.org= 中, 然后在空
+的时候, 再对 =refile.org= 中的待整理 (=refile=) 文件分门别类地处理好. 将 =refile.org= 处理成空的状态
+无疑是一个挺好的习惯.
+* TODO 重理事务
+:LOGBOOK:
+CLOCK: [2015-10-29 四 10:29]--[2015-10-29 四 10:36] =>  0:07
+:END:
+
+重理事务 (Refiling tasks) 很简单。当我们在 =refile.org= 中收集了一批新事务的时候，我们需要将这些事务
+进行重理，桥归桥，路归路，不同的事务放在它该处在的位置 (不同 =org= 文件和主题)。所有活跃的 =org= 文
+档都用 =org-agenda-files= 来保存，而且会被自动整理到日程中来。
+
+一个处理 =refile.org= 的方式是一周一整，这些快照事务每天都会在我的日程表中 ( =block agenda= )突出表现
+出来。通常我习惯上保持我的 =refile.org= 文件是空的。
+** DONE 重理设置 (Refiling Setup)
+CLOSED: [2015-10-29 四 11:11]
+:PROPERTIES:
+:CUSTOM_ID: RefilingSetup
+:END:
+:LOGBOOK:
+CLOCK: [2015-10-29 四 10:58]--[2015-10-29 四 11:11] =>  0:13
+- State "NEXT"       from "WAITING"    [2015-10-29 四 10:58]
+- State "WAITING"    from "NEXT"       [2015-10-29 四 10:53] \\
+  pomodoro waitting time
+CLOCK: [2015-10-29 四 10:36]--[2015-10-29 四 10:53] =>  0:17
+:END:
+
+如果需要重理 =org= 文件中的事务的话，你需要告知它重理事务存放在哪里。变量 =org-agenda-files= 记录的 
+路径下任意文件和当前文件均为重理事务存放位置的候选目标。
+
+当需要将快照事务重理的时候，只需要 =C-c C-w= 开始重理过程，然后敲入一些字符串，通过 =C-SPC= 来过滤当
+前候选列表 (需要注意，中文输入法的切换就是 =C-SPC= ，但是直接输入语句就可以过滤了，所以，这个不用也
+罢)。 =C-j= 也会选择当前匹配作为重理事务存放的最终目标。同时，我会设置目标中候选列表中条目显
+示全路径，这样就可以看到不同路径中同名的标题。
+
+我会将状态为 =DONE= 的事务排除重理目标的候选。这样可以使得重理目的地候选列表保持在一个合理的大小。下
+面是我的重理配置:
+
+#+header: :tangle yes
+#+begin_src emacs-lisp
+; Targets include this file and any file contributing to the agenda - up to 9 levels deep
+(setq org-refile-targets (quote ((nil :maxlevel . 9)
+                                 (org-agenda-files :maxlevel . 9))))
+
+; Use full outline paths for refile targes - we file directly with IDO
+(setq org-refile-use-outline-path t)
+
+; Targets complete directory with IDO
+(setq org-outline-path-complete-in-steps nil)
+
+; Allow refile to create parent tasks with confirmation
+(setq org-refile-allow-creating-parent-nodes (quote confirm))
+
+; Use IDO for both buffer and file completion and ido-everywhere to t
+(setq org-completion-use-ido t)
+(setq ido-everywhere t)
+(setq ido-max-directory-size 100000)
+(ido-mode (quote bot))
+
+; Use the current window when visiting files and buffers with ido
+(setq ido-default-file-method 'selected-window)
+(setq ido-default-buffer-method 'selected-window)
+
+; Use the current windows for indirect buffer display
+(setq org-indirect-buffer-display 'selected-window)
+
+;;;; Refile setting
+; Exclude DONE state tasks from refile targets
+(defun bh/verify-refile-target ()
+  "Exclude todo keywords with a done state from refile targets"
+  (not (member（nth 2 (org-heading-components)) org-done-keywords)))
+
+(setq org-refile-target-verify-function 'bh/verify-refile-target)
+#+end_src
+
+譬如我想把事务整理到 =norang.org= 文件中 =System Maintenance= 下，我只需要将光标移到需要重理的事务上
+然后 =C-c C-w= ，接着输入过滤语句，选择好需要重理事务的目的地后，回车，然后完事。 
+** DONE 重理事务
+CLOSED: [2015-10-29 四 13:49]
+:PROPERTIES:
+:CUSTUM_ID: RefilingTasks
+:END:
+:LOGBOOK:
+- State "NEXT"       from "HOLD"       [2015-10-29 四 13:42]
+CLOCK: [2015-10-29 四 13:41]--[2015-10-29 四 13:49] =>  0:08
+- State "HOLD"       from "NEXT"       [2015-10-29 四 11:23] \\
+  lunch break
+CLOCK: [2015-10-29 四 11:21]--[2015-10-29 四 11:23] =>  0:02
+:END:
+
+在 =block agenda= 中，需要重理的事务存放在一个独立的 =section= 中。为了找到需要重理的事务，只需要通
+过 =F12 SPC= 打开日程视图，然后往下到 =block agenda= 二级 =section= 中: =Tasks to Refile= 。这个视图
+会展示所有的事务 (即使事务标记为 =DONE= 状态)。
+
+如果同时有几个事务需要重理到相同位置，那么只需要用 =m= 标记事务，然后 =B r= 来重理它们到一个新地方。
+偶尔会有这种情况，我们需要将待重理事务作为当前计时任务的子任务，这时候可以 =C-2 C-c C-w= 来将待重整
+事务作为当前计时项目的子任务。
+
+通常，重理事务并不会花费太多时间，因此，建议在可以在一天中多次重理事务。
+** DONE 重理笔记
+CLOSED: [2015-10-29 四 13:59]
+:PROPERTIES:
+:CUSTOM_ID: RefilingNotes
+:END:
+:LOGBOOK:
+CLOCK: [2015-10-29 四 13:49]--[2015-10-29 四 13:59] =>  0:10
+:END:
+
+通常对于我的 =org-mode= 文件，个人习惯是设置一个 =* Notes= 标题来专门记录笔记。
+
+同时，利用快照创建的笔记会有 =NOTE= 标签，这样我们可以通过日程搜索函数 (agenda search function) 来方
+便地在多个不同文件中找到笔记。通常利用快照创建的笔记会带有 =NOTE= 标签，存放在 =refile.org= 文件中。
+之后，我们需要将这些笔记归门别类。如果笔记与对应的项目有关，那么可以不把笔记放在专门的 =* NOTES= 事
+务中，而是放在对应项目下面。通常与项目相关的笔记仅仅与特定的项目有关，不需要全局地记录。因此，当项目
+完成后，将笔记移出笔记列表是合理的做法。
+** DONE 重理电话和会议事务
+CLOSED: [2015-10-29 四 14:04]
+:PROPERTIES:
+:CUSTOM_ID: RefilingPhoneCallsAndMeetings
+:LOGBOOK:
+CLOCK: [2015-10-29 四 13:59]--[2015-10-29 四 14:04] =>  0:05
+:END:
+
+电话和会议通过快照模式处理。当创建一个电话或者会议事务，起讫时间会被自动记录。之后重理 =refile.org= 
+中的电话或会议事务的时候，有些电话时间会比较长，为了更精确地追溯之间的时间花销，我们可以将这些电话或
+会议事务重理到合适的项目下，使得时间追溯尽可能得精确。
+* TODO 定制日程视图 (Custom agenda views)
+:PROPERTIES:
+:CUSTUM_ID: CustomAgendaViews
+:END:
+:LOGBOOK:
+CLOCK: [2015-10-29 四 14:30]--[2015-10-29 四 14:39] =>  0:09
+- State "NEXT"       from "WAITING"    [2015-10-29 四 14:30]
+- State "WAITING"    from "NEXT"       [2015-10-29 四 14:11] \\
+  pomodoro waiting time
+CLOCK: [2015-10-29 四 14:06]--[2015-10-29 四 14:10] =>  0:04
+:END:
+
+现在，我有一个 =block agenda= 视图，上面包含了我所有个人事务。但是与此同时，我还保留了单独的日程视图 
+（separate single view agenda） 方便在配置较差的电脑上查看日程。我会尽量简化保持在单独日程视图中需
+要花费我大块时间的手头事务。
+
+定制日程视图可以用来:
+- Single block agenda shows the following
+  - Overview of today
+  - Finding tasks to be refiled
+  - Finding stuck projects
+  - Finding =NEXT= tasks to work on
+  - Show all related tasks
+  - Reviewing projects
+  - Finding tasks waiting on something
+  - Finding tasks to be archived
+- Finding notes
+- Viewing habits
+
+假如我只需要今天的日程视图，那么可以 =F12 a= ，这个方式会比生成 =block agenda= 视图更快。如果是当你
+想要查看一周甚至一个月的有用信息或者查看计时数据时， =block agenda= 额外的细节其实并不是那么重要，也
+不需要你花费很多时间等待 =block agenda= 视图生成。
+
+** DONE 设置
+CLOSED: [2015-10-29 四 14:43]
+:PROPERTIES:
+:CUTOM_ID: CustomAgendaViewsSetup
+:END:
+:LOGBOOK:
+CLOCK: [2015-10-29 四 14:39]--[2015-10-29 四 14:43] =>  0:04
+:END:
+
+#+header: :tangle yes
+#+begin_src emacs-lisp
+;; Do not dim blocked tasks
+(setq org-agenda-dim-blocked-tasks nil)
+
+;; Compact the block agenda view
+(setq org-agenda-compact-blocks t)
+
+;; Custom agenda command definitions
+(setq org-agenda-custom-commands
+      (quote (("N" "Notes" tags "NOTE"
+               ((org-agenda-overriding-header "Notes")
+                (org-tags-match-list-sublevels t)))
+              ("h" "Habits" tags-todo "STYLE=\"habit\""
+               ((org-agenda-overriding-header "Habits")
+                (org-agenda-sorting-strategy
+                 '(todo-state-down effort-up category-keep))))
+              (" " "Agenda"
+               ((agenda "" nil)
+                (tags "REFILE"
+                      ((org-agenda-overriding-header "Tasks to Refile")
+                       (org-tags-match-list-sublevels nil)))
+                (tags-todo "-CANCELLED/!"
+                           ((org-agenda-overriding-header "Stuck Projects")
+                            (org-agenda-skip-function 'bh/skip-non-stuck-projects)
+                            (org-agenda-sorting-strategy
+                             '(category-keep))))
+                (tags-todo "-HOLD-CANCELLED/!"
+                           ((org-agenda-overriding-header "Projects")
+                            (org-agenda-skip-function 'bh/skip-non-projects)
+                            (org-tags-match-list-sublevels 'indented)
+                            (org-agenda-sorting-strategy
+                             '(category-keep))))
+                (tags-todo "-CANCELLED/!NEXT"
+                           ((org-agenda-overriding-header (concat "Project Next Tasks"
+                                                                  (if bh/hide-scheduled-and-waiting-next-tasks
+                                                                      ""
+                                                                    " (including WAITING and SCHEDULED tasks)")))
+                            (org-agenda-skip-function 'bh/skip-projects-and-habits-and-single-tasks)
+                            (org-tags-match-list-sublevels t)
+                            (org-agenda-todo-ignore-scheduled bh/hide-scheduled-and-waiting-next-tasks)
+                            (org-agenda-todo-ignore-deadlines bh/hide-scheduled-and-waiting-next-tasks)
+                            (org-agenda-todo-ignore-with-date bh/hide-scheduled-and-waiting-next-tasks)
+                            (org-agenda-sorting-strategy
+                             '(todo-state-down effort-up category-keep))))
+                (tags-todo "-REFILE-CANCELLED-WAITING-HOLD/!"
+                           ((org-agenda-overriding-header (concat "Project Subtasks"
+                                                                  (if bh/hide-scheduled-and-waiting-next-tasks
+                                                                      ""
+                                                                    " (including WAITING and SCHEDULED tasks)")))
+                            (org-agenda-skip-function 'bh/skip-non-project-tasks)
+                            (org-agenda-todo-ignore-scheduled bh/hide-scheduled-and-waiting-next-tasks)
+                            (org-agenda-todo-ignore-deadlines bh/hide-scheduled-and-waiting-next-tasks)
+                            (org-agenda-todo-ignore-with-date bh/hide-scheduled-and-waiting-next-tasks)
+                            (org-agenda-sorting-strategy
+                             '(category-keep))))
+                (tags-todo "-REFILE-CANCELLED-WAITING-HOLD/!"
+                           ((org-agenda-overriding-header (concat "Standalone Tasks"
+                                                                  (if bh/hide-scheduled-and-waiting-next-tasks
+                                                                      ""
+                                                                    " (including WAITING and SCHEDULED tasks)")))
+                            (org-agenda-skip-function 'bh/skip-project-tasks)
+                            (org-agenda-todo-ignore-scheduled bh/hide-scheduled-and-waiting-next-tasks)
+                            (org-agenda-todo-ignore-deadlines bh/hide-scheduled-and-waiting-next-tasks)
+                            (org-agenda-todo-ignore-with-date bh/hide-scheduled-and-waiting-next-tasks)
+                            (org-agenda-sorting-strategy
+                             '(category-keep))))
+                (tags-todo "-CANCELLED+WAITING|HOLD/!"
+                           ((org-agenda-overriding-header (concat "Waiting and Postponed Tasks"
+                                                                  (if bh/hide-scheduled-and-waiting-next-tasks
+                                                                      ""
+                                                                    " (including WAITING and SCHEDULED tasks)")))
+                            (org-agenda-skip-function 'bh/skip-non-tasks)
+                            (org-tags-match-list-sublevels nil)
+                            (org-agenda-todo-ignore-scheduled bh/hide-scheduled-and-waiting-next-tasks)
+                            (org-agenda-todo-ignore-deadlines bh/hide-scheduled-and-waiting-next-tasks)))
+                (tags "-REFILE/"
+                      ((org-agenda-overriding-header "Tasks to Archive")
+                       (org-agenda-skip-function 'bh/skip-non-archivable-tasks)
+                       (org-tags-match-list-sublevels nil))))
+               nil))))
+
+#+end_src
+** DONE 下一步我做什么 (What do I work on next?)
+CLOSED: [2015-10-29 四 15:10]
+:PROPERTIES:
+:CUSTUM_ID: WhatDoIWorkOnNext
+:END:
+:LOGBOOK:
+- State "NEXT"       from "WAITING"    [2015-10-29 四 15:02]
+- State "WAITING"    from "NEXT"       [2015-10-29 四 14:56] \\
+  pomodoro waiting time
+CLOCK: [2015-10-29 四 14:44]--[2015-10-29 四 14:55] =>  0:11
+:END:
+
+我一般是这样开始一天的，首先，从截止期和计划今日或更早处理的事务开始，然后在 =block agenda= 视图中查
+看 =Next Tasks= 列表中的事务。个人倾向于在处理当前项目的时候，将它安排在 '今天' 处理。然后它们就会出
+现在我的每日日程中，提醒我这个项目需要完成。通常，我在每日日程中只会安排一到两个项目，同时，将不再重
+要和今天不需要关注的项目移出今日日程中。
+
+当我需要查找一个新的待处理事务的时候，通常，我会敲击 =F12 SPC= 来得到 =block agenda= 并且遵从以下原
+则:
+
+- Pick something off today's agenda
+  - deadline for today (do this first - it's not late yes)
+  - deadline in the past (it's always late)
+  - a scheduled task for today that is still on the agenda
+  - deadline that is coming up soon
+- pick up a =NEXT= task
+- If you run out of items to work on, look for a =NEXT= task in the current context, pick a task 
+from the Tasks lisk of the current project
+*** DONE 为什么将它记录在 =NEXT= 列表中 （Why keep it all on the =NEXT= list?)
+CLOSED: [2015-10-29 四 15:10]
+:PROPERTIES:
+:CUSTUM_ID: WhyKeepItInNEXTList
+:END:
+:LOGBOOK:
+CLOCK: [2015-10-29 四 15:02]--[2015-10-29 四 15:10] =>  0:08
+:END:
+
+如何利用更 =GTD= ( =Getting Things Done= )的方式来做事，可以使用一份 =NEXT= 列表。正常的项目都会有标
+签为 =NEXT= 的子事务 （stuck projects initiate the need for marking or creating =NEXT= tasks) ，一个
+带有 =NEXT= 标签的事务就是可以 /现在/ 处理的事务。
+
+=NEXT= 列表，基本上就是 '当前是什么' （'what is current'），就是项目进行下去的正常事务。我需要很快知
+道下一步需要做什么，那么保持这么一份列表很有必要。如果需要将任务从 =NEXT= 列表中移出，只需要将其标记
+为 =TODO= 状态即可。
+
+** DONE 阅读邮件，新闻组和 IRC 上的讨论
+CLOSED: [2015-10-29 四 21:26]
+:PROPERTIES:
+:CUSTUM_ID: ReadingMailNewsIRC
+:END:
+:LOGBOOK:
+CLOCK: [2015-10-29 四 21:08]--[2015-10-29 四 21:26] =>  0:18
+:END:
+
+当阅读邮件、新闻组和 IRC 上的讨论时，我会让默认的事务 (通常是 =** Organization= ) 记录下我在这些事情上
+花费的时间。阅读邮件的话，我会使用 =Gnus= ，假如有需要回复的邮件的话，就会利用快照创建一个标题为 '回
+复给 <用户>' 的事务。这会自动链接到事务中的邮件地址，方便之后寻找收件人。邮件回复的事务，有些可以很
+快，有些则需要一些研究，花费比较多的时间来处理。因此，我会对每个需要回复的邮件各自单独设置一个计时任
+务以便之后需要查找时间。给 =Respond to tasks= 设置的快照模板现在被安排在当天完成。这样，我就可以将事
+务安排在合适的 =org= 文件中而不需要失去一周的事务。(The capture template for Respond To Tasks is now
+scheduled for today so I can refile the task to the appropriate org file without losing the task for 
+a week.)
+
+下面，利用 =F12 a= 我就可以从 =block agenda= 中进入新近创建的需要重理的事务中，给一个邮件事务进行计
+时并处理。重复这个过程，直到所有的 'Respond to <user>' 事务都被标记为 =DONE= 。
+
+我会在 Gnus 上阅读邮件和新闻组，因此我不会对快速浏览做单独的计时。假如某篇文章其中有我需要的有用的片
+段，并且需要记录下来，我就会用 =C-c c n= 来创建一个笔记 （note) ，然后进入文章并整理它。实际上这几乎
+不会造成额外时间开销，而且我知道，之后，笔记可以安全地整理。我在快照缓冲区花费的时间会被快照笔记中的
+计时器记录下来。
+** DONE 过滤 (filtering)
+CLOSED: [2015-10-29 四 21:53]
+:PROPERTIES:
+:CUSTUM_ID: Filtering
+:END:
+:LOGBOOK:
+CLOCK: [2015-10-29 四 21:27]--[2015-10-29 四 21:33] =>  0:06
+:END:
+
+经常会出现这种场景，任务很多但是时间却很少。在这许多事务中 (可能几百个事务) 要找到需要的事务会变得很
+困难。这时候，利用日程过滤 ( =agenda filtering= ) 可以节省不少时间。
+
+假如现在是上午 11:53，不久就会到我的午饭时间。这时候，我会希望能找到花费时间比较少的事务，这时候很简
+单，只需要打开列表查看时间消耗比较少的事务就可以了。
+
+那么怎么做呢？从 =block agenda= 中获取 =NEXT= 列表中的任务，然后利用过滤 narrow 进去。在 =NEXT= 日程
+视图中，事务会按照估计需时来排列，需时较短的排前面，时长略长的就往后排。然后，我可以通过 =/ + 1= 对
+当前事务列表进行过滤，挑出符合要求时长的事务列表。
+*** DONE 利用 / RET 自动移出事务内容 (Automatically removing context based task with / RET)
+CLOSED: [2015-10-29 四 21:52]
+:PROPERTIES:
+:CUSTUM_ID: FilteringAutoRemoveTasks
+:END:
+:LOGBOOK:
+CLOCK: [2015-10-29 四 21:38]--[2015-10-29 四 21:52] =>  0:14
+:END:
+
+=/ RET= 在日程中非常有用，它可以根据用户提供的函数自动进行过滤。工作中，经常会遇到这种情况，当我在某
+项工程的时候，某些其他任务会突然出现，并且优先级会更高，这意味着我需要立刻停止手头工作并开始其他的工
+作。我会把当前的项目状态设置为 =HOLD= 然后开始其他工作。 =/ RET= 会移出 =HOLD= 标签事务及其子事务。
+
+在家的时候，我会有一些事务的标签为 =farm= ，但是由于通常 =farm= 事务并不频繁，我会在系统中将其加入 
+=auto-exclude= 标签。现在我身处农场 (farm)，然后我想处理 =farm= 标签的事务，正常的 =NEXT= 列表中并不
+会显示这些 =farm= 事务，那么利用 =/ TAB farm RET= 就可以过滤出我需要的 =farm= 事务。下面是我这么做的
+配置文件:
+
+#+header: :tangle yes
+#+begin_src emacs-lisp
+(defun bh/org-auto-exclude-function (tag)
+  "Automatic task exclusion in the agenda with / RET"
+  (and (cond
+        ((String= tag "hold")
+         t)
+        ((String= tag "farm")
+         t))
+       (concat "-" tag)))
+
+(setq org-agenda-auto-exclusion-function 'bh/org-auto-exclude-function)
+#+end_src
+
+这样的配置使得我可以通过 =/ RET= 在已经移出事务的日程上找到需要的事务。
+* TODO 计时 (Time Clocking)
+:PROPERTIES:
+:CUSTUM_ID: Clocking
+:END:
+:LOGBOOK:
+CLOCK: [2015-11-07 六 15:01]--[2015-11-07 六 15:02] =>  0:01
+CLOCK: [2015-10-31 六 08:19]--[2015-10-31 六 08:34] =>  0:15
+CLOCK: [2015-10-30 五 22:30]--[2015-10-30 五 22:55] =>  0:25
+:END:
+好吧，我得承认，我是计时狂热爱好者。工作中我会对所有一切都进行计时。而 =org-mode= 使这变得非常容易。
+计时可以使得我们在一天结束后可以回溯这一天，我们的时间究竟是如何开销的。在那些项目上花费了太多时间，
+而在哪些项目上花销的时间又太少。这对于帮助我们制定任务计划无疑帮助巨大。当我们制定计划的时候，由于之
+前在类似项目上所费时间已经知道，那么对于新计划可能花销时间我们可以做一个比较准确的估计。
+
+习惯上，我会用 =punch in= 这个概念来标志我一天工作的开始，而用 =punch out= 来标志我一天工作的结束。
+=org-mode= 默认设置对于我们的碎片时间处理得并不好。我的计时设置基本流程如下所示:
+
+- Punch in (start the clock)
+  - This clock in a predefined task by =org-id= that is the default task to clock in whenever the
+    clock normally stops
+- Clock in tasks normally, and let moving to a =DONE= state clock out
+  - clocking out automatically clocks time to a parent task or moves back to the parent exists.
+- Continue clocking whatever tasks you work on
+- Punch out (stop the clock)
+
+默认事务可以随意修改，但是由于项目树上计时器的自动计时，我不需要修改默认事务，而只需要用一个单独的事
+务来记录从我 =punch in= 之后的所有时间。( /hard to translate and understand/ )
+
+假如说我设定在 =Project X= 上的某个事务上 =punch in= ，那么那个事务自动变成默认事务，所有的计时都会
+在那个项目上继续，除非我 =punch out= 或者 =punch in= 其他事务中。
+
+我的 =org= 文件表示如下所示:
+
+=todo.org=:
+#+begin_src org :exports src
+,#+FILETAGS: PERSONAL
+...
+,* Tasks
+,** Organization
+   :PROPERTIES:
+   :CLOCK_MODELINE_TOTAL: today
+   :ID:       eb155a82-92b2-4f25-a3c6-0304591af2f9
+   :END:
+   ...
+#+end_src
+
+假如我正在处理一些事务，我就会对该事务进行计时。计时结束 ( =clocking out= ) 会使计时器移到带有 =TODO=
+关键词 (加入有的话) 的父任务上。父任务会在相同的子树上维护这个计时器。 ( /hard to understand/ )。假
+如父任务没有 =TODO= 关键词的话，计时器就会转移到默认的计时任务上，直到我 =punch out= 或者 =clock in=
+其他事务。如果在我工作时需要打断一下，那么我会开启一个快照事务，快照事务会自动计时，一直到我
+=C-c C-c= 可以处理之前的事务。
+
+比如说，考虑如下的 =org= 文件:
+
+#+begin_src org :exports src
+,* TODO Project A
+,** NEXT TASK 1
+,** TODO TASK 2
+,** TODO TASK 3
+,* Tasks
+,** TODO Some miscellaneous task
+#+end_src
+
+我会按照以下顺序进行工作:
+
+1. 用 =F9-I= 来 =punch in= ，开启我一天的工作
+   这个操作会自动开始在我的 =todo.org= 文件下的 =Organization= 事务开始计时
+2. =F12-SPC= 查看我的 =block agenda=
+   选择 'TODO Some miscellaneous task' 作为我接下来的工作并利用 =I= 对这个事务开始计时。现在计时器在
+   'TODO Some miscellaneous task'上面
+3. 当我完成那项事务后， =C-c C-t d= 来标记任务完成
+   这样会停止该项事务上的时钟，同时会将计时器移动到默认的 =Organization= 任务上
+4. 现在我想要开始进行 =Project A= 上的工作，所以我在 =Task 1= 上 =clock in=
+   我在 =Task 1= 上工作，然后标记它为 =DONE= 状态。这样，在 =Task 1= 上的时钟会停止 ( =clock out= )
+   并自动移动到 =Project A= 上。现在我可以开始 =Task 2= 上的工作并 =clock in=
+
+   我工作的整个时间，在 =Project A= 各个子事务上花费的时间以及在 =Project A= 上所有的时间间隔 (碎片
+   时间，譬如快照事务等) 都会被记录下来。当我最终将 =Project A= 标记为 =DONE= 的时候，计时器会移动到
+   默认任务上去。
+** DONE 时间设置
+CLOSED: [2015-10-31 六 15:21]
+:PROPERTIES:
+:CUSTUM_ID: ClockSetup
+:END:
+:LOGBOOK:
+CLOCK: [2015-10-31 六 10:09]--[2015-10-31 六 10:34] =>  0:25
+CLOCK: [2015-10-31 六 08:34]--[2015-10-31 六 08:57] =>  0:23
+:END:
+
+作为开始，我们需要 =punch in= 到默认事务上，然后使得计时器开始计时。完成这项操作很简单， =F9 I= 就可
+以。无论何时何地，你都可以使用该操作。 =clocking out= 会使得计时器在父任务上继续计时 (假如父任务有
+=TODO= 关键词的话) 或者在默认任务上继续计时 (假如父任务不存在) 。
+
+当某项目的某个子任务变为 =DONE= 状态时，计时器会保持运行，这意味着计时会接着作用到项目任务上。我可以
+从父任务中接着挑选任务并进行 =clock in= 而不需要在决定接下来做什么工作的时候丢失这个时间片段。
+
+我的配置中，所有的计时，状态改变和其他记录都会存放在 =:LOGBOOK= 这个抽屉里。以上的计时操作的配置文件
+如下:
+
+#+header: :tangle yes
+#+begin_src emacs-lisp
+;;
+;; Resume clocking task when emacs is restarted
+(org-clock-persistence-insinuate)
+;;
+;; Show lot of clocking history so it's easy to pick items off the C-F11 list
+(setq org-clock-history-length 23)
+;; Resume clocking task on clock-in if the clock is open
+(setq org-clock-in-resume t)
+;; Change tasks to NEXT when clocking in
+(setq org-clock-in-switch-to-state 'bh/clock-in-to-next)
+;; Separate drawers for clocking and logs
+(setq org-draws (quote ("PROPERTIES" "LOGBOOK")))
+;; Save clock data and state changes and notes in the LOGBOOK drawer
+(setq org-clock-into-drawer t)
+;; Sometimes I change tasks I'm clocking quickly - this removes clocked tasks with 0:00 duration
+(setq org-clock-out-remove-zero-time-clocks t)
+;; Clock out when moving task to a done state
+(setq org-clock-out-when-done t)
+;; Save the running clock and all clock history when exiting Emacs, load it on startup
+(setq org-clock-persist t)
+;; Do not prompt to resume an active clock
+(setq org-clock-persist-query-resume nil)
+;; Enable auto clock resolution for finding open clocks
+(setq org-clock-auto-clock-resolution (quote when-no-clock-is-running))
+;; Include current clocking task in clock reports
+(setq org-clock-report-include-clocking-task t)
+
+(setq bh/keep-clock-runing nil)
+(defun bh/clock-in-to-next (kw)
+  "Switch a task from TODO to NEXT when clocking in.
+Skips capture tasks, projects, and subprojects.
+Switch projects and subprojects from NEXT back to TODO"
+  (when (not (and (boundp 'org-capture-mode) org-capture-mode))
+    (cond
+     ((and (member (org-get-todo-state) (list "TODO"))
+           (bh/is-task-p))
+      "NEXT")
+     ((and (member (org-get-todo-state) (list "NEXT"))
+           (bh/is-project-p))
+      "TODO"))))
+
+(defun bh/find-project-task ()
+  "Move point to the parent (project) task if any"
+  (save-restriction
+    (widen)
+    (let ((parent-task (save-excursion (org-back-to-heading 'invisible-ok) (point))))
+      (while (org-up-heading-safe)
+        (when (member (nth 2 (org-heading-components)) org-todo-keywords-1)
+          (setq parent-task (point))))
+      (goto-char parent-task)
+      parent-task)))
+
+(defun bh/punch-in (arg)
+  "Start continuous clocking and set the default task to the
+selected task.  If no task is selected set the Organization task
+as the default task."
+  (interactive "p")
+  (setq bh/keep-clock-running t)
+  (if (equal major-mode 'org-agenda-mode)
+      ;;
+      ;; We're in the agenda
+      ;;
+      (let* ((marker (org-get-at-bol 'org-hd-marker))
+             (tags (org-with-point-at marker (org-get-tags-at))))
+        (if (and (eq arg 4) tags)
+            (org-agenda-clock-in '(16))
+          (bh/clock-in-organization-task-as-default)))
+    ;;
+    ;; We are not in the agenda
+    ;;
+    (save-restriction
+      (widen)
+      ; Find the tags on the current task
+      (if (and (equal major-mode 'org-mode) (not (org-before-first-heading-p)) (eq arg 4))
+          (org-clock-in '(16))
+        (bh/clock-in-organization-task-as-default)))))
+
+(defun bh/punch-out ()
+  (interactive)
+  (setq bh/keep-clock-running nil)
+  (when (org-clock-is-active)
+    (org-clock-out))
+  (org-agenda-remove-restriction-lock))
+
+(defun bh/clock-in-default-task ()
+  (save-excursion
+    (org-with-point-at org-clock-default-task
+      (org-clock-in))))
+
+(defun bh/clock-in-parent-task ()
+  "Move point to the parent (project) task if any and clock in"
+  (let ((parent-task))
+    (save-excursion
+      (save-restriction
+        (widen)
+        (while (and (not parent-task) (org-up-heading-safe))
+          (when (member (nth 2 (org-heading-components)) org-todo-keywords-1)
+            (setq parent-task (point))))
+        (if parent-task
+            (org-with-point-at parent-task
+              (org-clock-in))
+          (when bh/keep-clock-running
+            (bh/clock-in-default-task)))))))
+
+(defvar bh/organization-task-id "eb155a82-92b2-4f25-a3c6-0304591af2f9")
+
+(defun bh/clock-in-organization-task-as-default ()
+  (interactive)
+  (org-with-point-at (org-id-find bh/organization-task-id 'marker)
+    (org-clock-in '(16))))
+
+(defun bh/clock-out-maybe ()
+  (when (and bh/keep-clock-running
+             (not org-clock-clocking-in)
+             (marker-buffer org-clock-default-task)
+             (not org-clock-resolving-clocks-due-to-idleness))
+    (bh/clock-in-parent-task)))
+
+(add-hook 'org-clock-out-hook 'bh/clock-out-maybe 'append)
+ #+end_src
+** DONE 开始计时 (Clocking in)
+CLOSED: [2015-10-31 六 16:10]
+:PROPERTIES:
+:CUSTUM_ID: ClockingIn)
+:END:
+
+当我开始或者继续一项工作的时候，我会利用如下命令对其进行计时:
+
+- =C-c C-x C-i=
+- 日程表中时 =I=
+- 在标题第一个字符处，使用 =I= speed key (/what is speed key/)
+- 在日程表中某个事务上， =F9 I=
+- 在 =org= 文件中某个事务上 =F9 I=
+
+*** DONE Setting a default clock task
+CLOSED: [2015-10-31 六 15:37]
+:PROPERTIES:
+:CUSTUM_ID: ClockingInDefaultTask
+:END:
+:LOGBOOK:
+CLOCK: [2015-10-31 六 15:22]--[2015-10-31 六 15:37] =>  0:15
+:END:
+
+在我的 =todo.org= 文件中有一个默认的 =** Organization= 事务用来记录我的乱七八糟的碎片时间。这里是我
+开始一天工作时， =punch in= 时默认开启计时的地方。当重理 (reorganizing) 我的 =org= 文件，阅读邮件，
+清理收件箱和做其他计划工作但是与项目无关的工作时，我会在该事务下进行计时。任意地方 =punch in= ，我都
+可以进入到该默认事务下。
+
+假如我想要更改默认的计时事务时，我只需要访问任意 =org= 缓冲区中的一个新的事务，然后通过
+=C-u C-u C-c C-x C-i= 来进行计时。现在该事务就成为了默认计时存放事务了。你可以通过 =C-u C-c C-x C-i d=
+来快速对默认计时任务进行计时。另外一种移到默认事务的方式就重复 =clock out= 一直到顶层事务之后，再次
+=clock out= 会使得计时器移到默认事务上。
+*** DONE 使用计时历史来对历史事务计时
+CLOSED: [2015-10-31 六 15:55]
+:PROPERTIES:
+:CUSTUM_ID: ClockingInByClockHistory
+:END:
+:LOGBOOK:
+CLOCK: [2015-10-31 六 15:38]--[2015-10-31 六 15:53] =>  0:15
+:END:
+
+你可以使用计时历史重启在历史事务上的计时或者直接跳到之前计时过的事务上。通常我会在被打断后回来时使用
+该功能。
+
+考虑如下场景:
+
+- 你正在 =Task A= 上工作并计时 (Organization)
+- 你被打断，现在跳到了 =Task B= (Document my use of org-mode) 上
+- 你完成了 =Task B= （Document my use of org-mode)
+- 现在你回到 =Task A= (Organization) 上并继续工作
+
+这样的场景可以很容易地按如下处理:
+
+1. 对 =Task A= 计时，工作
+2. 进入 =Task B= (或者开始一项新事务) 并进行计时
+3. 当你结束 =Task B= 时，只需要 =C-u C-c C-x C-i i=
+
+这样的操作会打开一个窗口，展示如下所示的计时历史，选择需要开始被打断的条目
+
+*Clock history selection buffer for C-u C-c C-x C-i*
+#+begin_example
+Default Task
+[d] norang          Organization                          <-- Task B
+The task interrupted by starting the last one
+[i] norang          Organization                          <-- Task B
+Current Clocking Task
+[c] org             NEXT Document my use of org-mode      <-- Task A
+Recent Tasks
+[1] org             NEXT Document my use of org-mode      <-- Task A
+[2] norang          Organization                          <-- Task B
+...
+[Z] org             DONE Fix default section links        <-- 35 clock task entries ago
+#+end_example
+** DONE 给一切计时 - 创建新事务 （Clock Everything - Creat New Tasks)
+CLOSED: [2015-10-31 六 16:10]
+:PROPERTIES:
+:CUSTUM_ID: ClockEverythingWithNewTasks
+:END:
+:LOGBOOK:
+CLOCK: [2015-10-31 六 15:55]--[2015-10-31 六 16:10] =>  0:15
+:END:
+
+为了给所有事务都计时，你需要一个记录一切时间的事务。对于计划内项目，这种方式比较简单，但是如果突发情
+况下，你需要记录下打断你的事务及其所花销的时间。为了记录这个，我们创建一个新的快照事务来记录我们将要
+做的事情。工作流大体如下:
+
+- 你在某事务上工作时，计时同步进行，这时突发状况，你需要打断目前的工作
+- 创建一个快照事务，创建一个日志条目 =C-c c j=
+- 输入标题
+- 做那件事情 (吃午饭或者别的什么事情)
+- =C-c C-c= 整理好其他事情，这个会保存快照记录时间，并还原之前的计时任务
+- 给其他事务计时或者继续当前的计时任务
+
+这意味着你不需要关心这个事务究竟处在你的 =org= 文件哪个位置，而只需要继续往前将工作完成。之后在某个
+方便的时间，将一堆事务重理到对应位置。
+
+假如仅仅是一次无趣的事务 (譬如喝咖啡) ，我会为其创建一个日志快照，之后存放到 =diary.org= 日期树中。
+假如这个事务确实需要被追溯并标志为 =DONE= 状态，之后整理到合适的项目中，那么我会创建一个非日志的快照
+事务，这个事务会先进入 =refile.org= ，之后需要重理。
+** DONE 找到需要计时的事务 (Finding tasks to clock in)
+CLOSED: [2015-10-31 六 16:17]
+:PROPERTIES:
+:CUSTUM_ID: FindTasksToClockIn
+:END:
+:LOGBOOK:
+CLOCK: [2015-10-31 六 16:11]--[2015-10-31 六 16:17] =>  0:06
+:END:
+
+我会采用以下方法 (一般列出了最常用的方式) 找到事务并计时:
+
+- 使用计时历史 =C-u C-c C-x C-i=
+  回到之前未完成的计时事务上
+- 从今日的 =block agenda= 中挑出 =SCHEDULED= 和 =DEADLINE= 条目
+- 从 =NEXT= 任务日程视图中挑出需要处理的事务。
+- 从其他事务列表中挑出需要处理事务
+- 使用日程视图并过滤，挑出想要处理的事务
+
+=Punch in= 到某个你选择的事务上时会使得日程视图局限在那个项目上，这样你可以仅仅关注于当前阶段关注的
+事务上。
+
+** DONE 修改计时条目　(Editing Clock Entries)
+CLOSED: [2015-10-31 六 16:27]
+:PROPERTIES:
+:CUSTUM_ID: EditingClockEntries
+:END:
+:LOGBOOK:
+CLOCK: [2015-10-31 六 16:17]--[2015-10-31 六 16:27] =>  0:10
+:END:
+
+有时候需要对计时条目进行修改使其符合实际情况。有时候会出现这种状况，没有对某项事务及时得进行计时 (譬
+如离开电脑)。这种情况下之前计时的事务会继续计时。
+
+我会写一个关于时间的笔记然后当我回到电脑前的时候，我对正确的事务进行计时并修改事务的起讫时间使其符合
+实际情况。
+
+要快速进入计时行 (clock line) ，可以使用日程 log 模式。 =F12 a l= 会展示今天所有的计时行。我会用这个
+来切换到合适的计时行。 =F11= 会进入当前计时事务，但是日程 =log= 模式对于寻找和访问之前的计时条目会更
+合适。
+* TODO 计时报告和追溯 (Time reporting and tracking)
+:PROPERTIES:
+:CUSTUM_ID: TimeReportingAndTracking
+:ORDERED:  t
+:END:
+:LOGBOOK:
+CLOCK: [2015-11-01 日 19:59]--[2015-11-01 日 20:08] =>  0:09
+CLOCK: [2015-10-31 六 21:01]--[2015-10-31 六 21:03] =>  0:02
+:END:
+** DONE 根据已有时间记录估计未来开销 (Billing clients based on clocked time)
+CLOSED: [2015-11-01 日 20:17]
+:PROPERTIES:
+:CUSTUM_ID: BillingClientsForClockedTime
+:END:
+:LOGBOOK:
+CLOCK: [2015-10-31 六 21:03]--[2015-10-31 六 21:12] =>  0:09
+:END:
+
+每个月的一开始，我会给过去一个月给客户工作的时间做一个清单。在给计时数据做清单前，我会回顾过去的时间
+开销记录是否正确。给计时数据做清单主要是以下几步:
+
+1. 检查计时数据是否完整和正确
+2. 利用计时报告 (clock reports) 来总结时间花销
+3. 根据计时数据做出一份清单
+   我现在会根据 =org-mode= 计时数据在外部软件包中创建清单。
+4. 将任务进行归档
+*** DONE 检查计时数据是否完整和正确
+CLOSED: [2015-10-31 六 21:33]
+:LOGBOOK:
+CLOCK: [2015-10-31 六 21:12]--[2015-10-31 六 21:33] =>  0:21
+:END:
+
+因为我经常会频繁地切换任务 (有时候甚至会一分钟内切换好几次) ，利用以下设置可以将计时间隔为 0 的计时条
+目移除。
+
+#+header: :tangle yes
+#+begin_src emacs-lisp
+;; Sometimes I change task I'm clocking quickly - this removes clocked tasks with 0:00 duration
+(setq org-clock-out-remove-zero-time-clocks t)
+#+end_src
+
+这样的设置会使得我的计时 =log= 条目保持清晰 -- 只保留对计时报告有贡献的计时条目。
+
+在为计时数据制作清单的时候，保证计时数据的正确性很有必要。假如你有一个未关闭的计时条目 (也就是说它没
+有结束时间) ，那么它会变成成为你一天计时的黑洞，当生成时间报告的时候，这个任务的时间会显示为 0。
+
+为了检查没有关闭的计时，我会用 =agenda-view clock check= ( 在日程表中 =v c= )。这个视图会显示日程中
+的缺口或重叠部分。
+
+为了检查上个月的计时数据，我会使用 =F12 a v m b v c= 来展示整个月的日程。当检查缺口或重叠时，移除任
+何日程限制锁 (any agenda restriction locks) 和过滤条件非常重要。
+
+只在日程中展示计时数据使得查看列表中的条目是否缺少结束时间变得很容易。假如一个条目没有关闭，你可以很
+简单地根据上下计时数据将该条目进行修复。
+*** DONE 使用计时报告总结时间花销 (Using clock reports to summarize time spent)
+CLOSED: [2015-10-31 六 21:42]
+:LOGBOOK:
+CLOCK: [2015-10-31 六 21:33]--[2015-10-31 六 21:42] =>  0:09
+:END:
+
+为客户制作的时间清单会单独保存在一个 =org= 文件中。
+
+为了得到对 =XYZ.org= 中事务的时间开销报告，你只需要进入 =XYZ.org= 文档中， =F12 < a v m b R= 来打开
+上月日程计时报告。这会将日程限制在当前文件，展示这一整个月的日程，并生成报告。
+
+我的日程计时报告对于事务设置展示 5 级细节。相比默认的紧致设置，我更喜欢展开报告，所以我把 =:narrow= 值
+覆盖了。
+
+#+header: :tangle yes
+#+begin_src emacs-lisp
+;; Agenda clock report parameters
+(setq org-agenda-clockreport-parameter-plist
+      (quote (:link t :maxlevel 5 :fileskip0 t :compact t :narrow 80)))
+#+end_src
+** DONE 事务估计和列视图 (Task Estimates and column view)
+CLOSED: [2015-11-01 日 20:00]
+:PROPERTIES:
+:CUSTUM_ID: TaskEstimates
+:END:
+:LOGBOOK:
+CLOCK: [2015-10-31 六 21:50]--[2015-10-31 六 21:51] =>  0:01
+CLOCK: [2015-10-31 六 21:42]--[2015-10-31 六 21:47] =>  0:05
+:END:
+
+估计事务需要话费多少时间来完成是一项比较难掌握的技能。 =Org-mode= 使得估计任务完成时间然后记录任务真
+实完成时间非常简单。
+
+通过不断练习估计任务的时间开销，并通过确切开销时间不断调整对类似任务时间开销的估计，你可以不断提升你
+对于任务完成时间的估计。
+*** DONE 用列模式创建任务估计 (Creating a task estimate with column mode)
+CLOSED: [2015-10-31 六 22:07]
+:PROPERTIES:
+:CUSTUM_ID: CreatingTaskEstimates
+:END:
+:LOGBOOK:
+CLOCK: [2015-10-31 六 21:51]--[2015-10-31 六 22:07] =>  0:16
+:END:
+
+我用 =properties= 和 =column view= 来做项目估计。
+
+我会通过如下设置一个全局的列视图 (column view)
+
+#+header: :tangle yes
+#+begin_src emacs-lisp
+; Set default column view headings: Task Effort Clock_Summary
+(setq org-columns-default-format "%80ITEM(Task) %10Effort(Effort){:} %10CLOCKSUM")
+#+end_src
+
+这会使列视图展示对于任务的努力程度估计和并行列出的计时时间，这对于回顾你对项目估计帮助巨大。
+
+一个称之为 =Effort= 的性质会记录对于一个给定事务预计需要多少时间完成。估计时间我用以下列表之一表示:
+
+- 10 minutes
+- 30 minutes
+- 1 hour
+- 2 hours
+- 3 hours
+- 4 hours
+- 5 hours
+- 6 hours
+- 7 hours
+- 8 hours
+
+这些会被存放在 =column mode= 下作为一个全局性质 =Effort_ALL= ，方便以后取用。 
+
+#+header: :tangle yes
+#+begin_src emacs-lisp
+; global Effort estimate values
+; global STYLE property values for completion
+(setq org-global-properties (quote (("Effort_ALL" . "0:15 0:30 0:45 1:00 2:00 3:00 4:00 5:00 6:00 0:00")
+                                    ("STYLE_ALL" . "habit"))))
+#+end_src
+
+为了对一个事务或子树创建估计，用 =C-c C-x C-c= 打开 =column mode= 然后用 =c= 来折叠树。这会展示用事
+务名、努力估计和花销时间为标题的表格。
+
+将光标移动到某事务的 =Effort= 列上，你可以很容易地用快捷键 =1= 到 =9= 设定预估努力程度值。设置好努力
+程度值后， =q= 退出 =column mode= 。
+
+
+*** DONE 保存你的估计 (Saving your estimate)
+CLOSED: [2015-10-31 六 22:22]
+:PROPERTIES:
+:CUSTUM_ID: SavingEstimate
+:END:
+:LOGBOOK:
+CLOCK: [2015-10-31 六 22:09]--[2015-10-31 六 22:22] =>  0:13
+:END:
+ 
+对准备进行的工作进行估计，保存估计的值，然后按部就班地往下进行工作。保存努力估计可以通过在你准备估计
+的那个项目子树顶层创建一个动态的计时报告表。 =C-c C-x i RET= 来输入一个计时报告，其中输入你的努力估
+计和其他对日期的计时。
+
+#+begin_src org :exports src
+Original Estimate
+,#+BEGIN: columnview :hlines 1 :id local
+| Task                        | Estimated Effort | CLOCKSUM |
+|-----------------------------+------------------+----------|
+| ** TODO Project to estimate |             5:40 |          |
+| *** TODO Step 1             |             0:10 |          |
+| *** TODO Step 2             |             0:10 |          |
+| *** TODO Step 3             |             5:10 |          |
+| **** TODO Step 3.1          |             2:00 |          |
+| **** TODO Step 3.2          |             3:00 |          |
+| **** TODO Step 3.3          |             0:10 |          |
+| *** TODO Step 4             |             0:10 |          |
+,#+END:
+#+end_src
+
+在对客户提供了估计后，为了防止我很偶尔地 =C-c C-c= 更新表格， 我通常会对原来的表格删除 =#+BEGIN:= 和
+ =#+END:= 行。
+
+保存原始估计数据使得我们对项目的子任务处理时不会丢失原始的估计数据。
+*** DONE 回顾你的估计 (Reviewing your estimate)
+CLOSED: [2015-10-31 六 22:27]
+:PROPERTIES:
+:CUSTUM_ID: ReviewingEstimates
+:END:
+:LOGBOOK:
+CLOCK: [2015-10-31 六 22:23]--[2015-10-31 六 22:27] =>  0:04
+:END:
+
+回顾你的估计，可以通过 =Column view= 。这个视图会展示你估计的时间值，同时还会并行展示项目整体计时。 
+假如你需要保存项目的回顾给其他程序使用，那么用 =C-c C-x i RET= 来创建一个动态计时表格是很方便的一种
+方式。 =C-c C-x C-d= 同样为当前 =org= 文件提供了快速总结。
+** NEXT 提供其他的过程报告 (Providing Progress reports to others)
+:PROPERTIES:
+:CUSTUM_ID: ProgressReporting
+:END:
+:LOGBOOK:
+CLOCK: [2015-10-31 六 21:47]--[2015-10-31 六 21:50] =>  0:03
+:END:
+
+当需要查看最近我干了什么的时候, 我只需要生成一个 =log= 报告, 展示我最近完成的事务, 包含事务状态改变
+等各种时间信息.
+
+下面的设定展示了日程中关闭的事务和状态改变. 与日程时钟报告相结合 ('R'), 可以快速生成要求的所有细节.
+
+#+header: :tangle yes
+#+BEGIN_SRC emacs-lisp
+;; Agenda log mode items to display (closed and state changes by default)
+(setq org-agenda-log-mode-items (quote (closed state)))
+#+END_SRC
+
+为了产生合适的报告, 我会拉出合适的时间框架 (今天, 昨天, 本周, 或上周), 然后依次敲击 =l R= 来添加
+=log= 报告 (没有计时数据行) 和日程时钟报告.
+
+接下来的问题不过是按有用的格式来导出最后的日程并提供给别人. =C-x C-w /tmp/agenda.html RET= 导出会导
+出到 =HTML= , =C-x C-w  /tmp/agenda.txt RET= 导出到普通文本格式. 导出为其他格式也很方便, 不过这两种
+模式一般来说使用得更多.
+* TODO 标签 （Tags)
+:PROPERTIES:
+:CUSTUM_ID: Tags
+:END:
+
+** NEXT Tags
+:PROPERTIES:
+:CUSTOM_ID: OrgTagAlist
+:END:
+** TODO 文件标签
+:PROPERTIES:
+:CUSTOM_ID: FileTags
+:END:
+** TODO 状态标签触发 (State Trigger Tags)
+:PROPERTIES:
+:CUSTOM_ID: StateTriggerTags
+:END:
+* Footnotes
+
+[fn:4] 此时存疑, 因为实际上我做测试的时候, 就是一个 =PHONE= 状态啊, 完了还有一个 =PHONE= 标签.
+
+[fn:3] 注意: 因为 =todo= 关键词中有 =TODO= 这个状态, 而在行文中, 如果说我们要设置 =todo= 关键词, 读
+者不免疑惑, =todo= 到底指的是状态还是指示各状态的关键词, 因此, 我会用小写的 =todo= 表示状态关键词, 
+即 =DONE= =TODO= =WAITING= 的统一可以称之为 =todo= 关键词, 而 =TODO= 就是指未完成的状态啦.
+
+[fn:2] 需要注意的是: 此处键位设置沿用了原作者 Bernt Hansen 的键位设置, 但挺多键位要不没用, 要不需要配
+置, 囿于本人水平有限, 无力更改, 如果谁有能力有时间, 欢迎对所有键位测试并做说明. 此外, 本人使用的是 
+=Spacemacs= , 如果能将本人配置完美融合入 =Spacemacs= 的 =org layer= 中, 当然是最完美的啦, O(∩_∩)O 哈哈~
+
+[fn:1] 项目 (project) : 本文中用一种最简单的方式定义, 就是拥有带 =todo= 关键词的子事务的事务

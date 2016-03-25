@@ -1,0 +1,641 @@
+* 线程
+** 继承 =Thread=
+** 安全问题
+*** 同步代码块
+*** 同步函数
+*** =static= 同步函数
+** 通信
+*** 等待唤醒机制
+**** 代码优化
+*** 生产者与消费者 (=notifyAll()=)
+*** =Lock= 与 =Condition=
+*** =deamon= 和 =join=
+*** 优先级与 =yield=
+* 字符串
+** 特点
+*** =String= 两种初始化方式差别
+*** =String= 类 '==' 和 =equals()= 方法差别
+** 字符串常见功能
+*** 获取
+**** 字符串长度 =length()=
+数组长度，属性值 =length= 不带括号，字符串有长度，通过 =length()= 方法获取
+**** 根据位置获取字符
+#+BEGIN_SRC java
+  public char charAt(int index)
+#+END_SRC
+**** 根据字符获取字符在字符串中的位置
+#+BEGIN_SRC java
+  //Returns the index within this string of the first occurrence of the specified character
+  public int indexOf(int ch)
+#+END_SRC
+#+BEGIN_SRC java
+  //Returns the index within this string of the first occurrence of the specified character,
+  //starting the search at the specified index.
+  public int indexOf(int ch, int fromIndex)
+#+END_SRC
+#+BEGIN_SRC java
+  //Returns the index within this string of the first occurrence of the specified substring.
+  public int indexOf(String str)
+#+END_SRC
+#+BEGIN_SRC java
+  //Returns the index within this string of the first occurrence of the specified substring,
+  //starting at the specified index.
+  public int indexOf(String str, int fromIndex)
+#+END_SRC
+#+BEGIN_SRC java
+  public int lastIndexOf(String str)
+#+END_SRC
+#+BEGIN_SRC java
+  //Returns the index within this string of the last occurrence of the specified substring, 
+  //searching backward starting at the specified index.
+  public int lastIndexOf(String str, int fromIndex)
+#+END_SRC
+*** 判断
+**** 字符串中是否包含某内容
+#+BEGIN_SRC java
+  //Returns true if and only if this string contains the specified sequence of char values.
+  public boolean contains(CharSequence s)
+#+END_SRC
+#+BEGIN_SRC java
+  //If no such value of k exists, then -1 is returned.
+  public int indexOf(String str)
+#+END_SRC
+**** 是否为空
+#+BEGIN_SRC java
+  public boolean isEmpty()
+#+END_SRC
+**** 是否以指定内容开头
+#+BEGIN_SRC java
+  //Tests if this string starts with the specified prefix.
+  public boolean startsWith(String prefix)
+#+END_SRC
+#+BEGIN_SRC java
+  //Tests if the substring of this string beginning at the specified
+  //index starts with the specified prefix.
+  public boolean startsWith(String prefix, int toffset)
+  /* Parameters:
+     prefix - the prefix.
+     toffset - where to begin looking in this string.
+  ,*/
+#+END_SRC
+**** 是否以指定内容结尾
+#+BEGIN_SRC java
+  public boolean endsWith(String suffix)
+#+END_SRC
+**** 字符串内容是否相同, =String= 类复写了 =Object= 类中 =equals()= 方法
+**** 忽略大小写，字符串是否相同
+#+BEGIN_SRC java
+  public boolean equalsIgnoreCase(String anotherString)
+#+END_SRC
+*** 转换
+**** 字符数组与字符串互相转换
+***** 字符数组 -> 字符串
+1. 构造函数
+   #+BEGIN_SRC java
+    String(char[] value)
+    /*Allocates a new String so that it represents the sequence of characters 
+     currently contained in the character array argument.
+     ,*/
+   #+END_SRC          
+   #+BEGIN_SRC java
+    String(char[] value, int offset, int count)
+    /*Allocates a new String that contains characters from a subarray of the 
+     character array argument.
+     Parameters:
+     value - Array that is the source of characters
+     offset - The initial offset
+     count - The length
+     ,*/
+   #+END_SRC
+2. 静态方法
+   #+BEGIN_SRC java
+     public static String copyValueOf(char[] data)
+     //Equivalent to valueOf(char[]).
+   #+END_SRC
+   #+BEGIN_SRC java
+     public static String valueOf(char c)
+     /*Returns the string representation of the char argument.
+         Parameters:
+          c - a char.
+         Returns:
+          a string of length 1 containing as its single character the argument c.
+     ,*/
+   #+END_SRC
+   #+BEGIN_SRC java
+     public static String copyValueOf(char[] data,
+                                      int offset,
+                                      int count)
+     /*Equivalent to valueOf(char[], int, int).
+         Parameters:
+          data - the character array.
+         offset - initial offset of the subarray.
+         count - length of the subarray.
+         Returns:
+          a String that contains the characters of the specified subarray of the character array.
+         Throws:
+          IndexOutOfBoundsException - if offset is negative, or count is negative, or offset+count is larger than data.length.
+     ,*/
+   #+END_SRC
+***** 字符串 -> 字符数组
+#+BEGIN_SRC java
+  public char[] toCharArray()
+      Converts this string to a new character array.
+#+END_SRC
+**** 字节数组与字符串互相转换
+***** 字节数组 -> 字符串
+与字符数组类似，不过是将参数 =char []= 变为 =byte []=
+***** 字符串 -> 字节数组
+#+BEGIN_SRC java
+  public byte[] getBytes()
+  /*Encodes this String into a sequence of bytes using the platform's default charset, 
+    storing the result into a new byte array.
+    The behavior of this method when this string cannot be encoded in the default charset is 
+    unspecified. The CharsetEncoder class should be used when more control over the encoding 
+    process is required.
+  ,*/
+#+END_SRC
+#+BEGIN_SRC java
+  public byte[] getBytes(Charset charset)
+  /*Encodes this String into a sequence of bytes using the given charset, storing the result 
+    into a new byte array.
+    This method always replaces malformed-input and unmappable-character sequences with this 
+    charset's default replacement byte array. The CharsetEncoder class should be used when more
+    control over the encoding process is required.
+  ,*/
+#+END_SRC
+**** 将基本数据类型转换为字符串
+#+BEGIN_SRC java
+  3+""; //等价于 String.valueOf(3)
+  /*
+    public static String valueOf(int i)
+    public static String valueOf(long l)
+    public static String valueOf(float f)
+    public static String valueOf(double d)
+  ,*/
+#+END_SRC
+*** 替换
+#+BEGIN_SRC java
+  public String replace(char oldChar,
+                        char newChar)
+  //Returns a string resulting from replacing all occurrences of oldChar in this string with newChar.
+#+END_SRC
+#+BEGIN_SRC java
+  public String replace(CharSequence target,
+                        CharSequence replacement)
+  /*    Replaces each substring of this string that matches the literal target sequence
+        with the specified literal replacement sequence. The replacement proceeds from the
+        beginning of the string to the end, for example, replacing "aa" with "b" in the string
+        "aaa" will result in "ba" rather than "ab".
+   ,*/
+#+END_SRC
+*** 切割
+#+BEGIN_SRC java
+  public String[] split(String regex)
+  /*Splits this string around matches of the given regular expression.
+      This method works as if by invoking the two-argument split method with
+      the given expression and a limit argument of zero. Trailing empty strings
+      are therefore not included in the resulting array.
+  ,*/
+#+END_SRC
+*** 子串
+#+BEGIN_SRC java
+  public String substring(int beginIndex)
+  /*Returns a string that is a substring of this string.
+    The substring begins with the character at the specified index and extends to the end of this string.
+   ,*/
+#+END_SRC
+#+BEGIN_SRC java
+  public String substring(int beginIndex,
+                          int endIndex)
+  /*Returns a string that is a substring of this string.
+    The substring begins at the specified beginIndex and extends to the character at index endIndex - 1.
+    Thus the length of the substring is endIndex-beginIndex.
+  ,*/
+#+END_SRC
+*** 字符串转换
+**** 大小写转换
+#+BEGIN_SRC java
+  public String toUpperCase()
+  /*Converts all of the characters in this String to upper case using the rules of the default locale.
+    This method is equivalent to toUpperCase(Locale.getDefault()).
+  ,*/
+#+END_SRC
+#+BEGIN_SRC java
+  public String toLowerCase()
+#+END_SRC
+**** 去除字符串首尾空格
+#+BEGIN_SRC java
+  public String trim()
+  //Returns a string whose value is this string, with any leading and trailing whitespace removed.
+#+END_SRC
+**** 按自然顺序对字符串进行比较
+#+BEGIN_SRC java
+  public int compareTo(String anotherString)
+  /*Compares two strings lexicographically. The comparison is based on the Unicode value
+    of each character in the strings. The character sequence represented by this String object
+    is compared lexicographically to the character sequence represented by the argument string.
+    The result is a negative integer if this String object lexicographically precedes the argument
+    string. The result is a positive integer if this String object lexicographically follows the
+    argument string. The result is zero if the strings are equal; compareTo returns 0 exactly
+    when the equals(Object) method would return true.
+  ,*/
+#+END_SRC
+** 练习
+1. 模拟一个 =trim= 方法，去除字符串首尾空格
+2. 将字符串进行反转；将字符串指定部分进行反转。譬如 "abcdefg" -> "abfedcg"
+3. 获取一个字符串在另一个字符串中出现的次数
+4. 获取两个字符串中最大相同子串。第一个动作，将短的那个串进行长度依次递减的子串打印。
+** StringBuffer
+*** 说明
+=StringBuffer=: 字符串缓冲区，是一个容器，容器具有 C(create)U(update)R(read)D(delete) 功能
+*** 特点
+1. 长度可变
+2. 可以直接操作多个数据类型
+3. 最终通过 =toString= 方法转变为字符串
+*** 功能
+**** 存储
+1. =append()= 方法
+   #+BEGIN_SRC java
+     public StringBuffer append(boolean b)
+   #+END_SRC
+   #+BEGIN_SRC java
+     public StringBuffer append(char c)
+   #+END_SRC
+   #+BEGIN_SRC java
+     public StringBuffer append(int i)
+   #+END_SRC
+   #+BEGIN_SRC java
+     public StringBuffer append(char[] str,
+                                int offset,
+                                int len)
+     /*Appends the string representation of a subarray of the char array argument to this sequence.
+         Characters of the char array str, starting at index offset, are appended, in order, to the
+         contents of this sequence. The length of this sequence increases by the value of len.
+     ,*/
+   #+END_SRC
+   注意:
+   #+BEGIN_SRC java
+     StringBuffer sb = new StringBuffer();
+     StringBuffer sb1 = sb.append(34);
+   
+     System.out.println("sb: "+sb);
+     System.out.println("sb1: "+sb1);
+     System.out.println("sb == sb1: "+(sb==sb1));
+   #+END_SRC
+2. =insert()= 方法
+   #+BEGIN_SRC java
+     public StringBuffer insert(int index,
+                                char[] str,
+                                int offset,
+                                int len)
+     /*    Inserts the string representation of a subarray of the str array argument into this
+           sequence. The subarray begins at the specified offset and extends len chars. 
+           The characters of the subarray are inserted into this sequence at the position indicated by index. The length of this sequence increases by len chars.
+           Parameters:
+           index - position at which to insert subarray.
+           offset - the index of the first char in subarray to be inserted.
+           len - the number of chars in the subarray to be inserted.
+           Returns:
+           This object
+           StringIndexOutOfBoundsException - if index is negative or greater than length(), or 
+           offset or len are negative, or (offset+len) is greater than str.length.
+     ,*/
+   #+END_SRC
+   #+BEGIN_SRC java
+     public StringBuffer insert(int offset,
+                                Object obj)
+   #+END_SRC
+   #+BEGIN_SRC java
+     public StringBuffer insert(int offset,
+                                String str)
+   #+END_SRC
+   #+BEGIN_SRC java
+     public StringBuffer insert(int offset,
+                                char[] str)
+   #+END_SRC
+**** 删除
+1. =delete()= 方法
+   注意:
+   #+BEGIN_SRC java
+     StringBuffer sb = new StringBuffer("ABCDEFG");
+     sb.delete(1, 3);
+   #+END_SRC
+   以上代码删除第1,2个字符，不包括第3个字符
+2. 清空缓冲区:
+   #+BEGIN_SRC java
+     sb.delete(0, sb.length());
+   #+END_SRC
+**** 获取
+=charAt()= =indexOf()= =lastIndexOf()=
+=subString(int start, int end)=
+**** 修改
+#+BEGIN_SRC java
+  public StringBuffer replace(int start,
+                              int end,
+                              String str)
+  /*Replaces the characters in a substring of this sequence with characters in the specified String.
+    The substring begins at the specified start and extends to the character at index end - 1 or to
+    the end of the sequence if no such character exists. First the characters in the substring are
+    removed and then the specified String is inserted at start. (This sequence will be lengthened to
+    accommodate the specified String if necessary.)
+    Parameters:
+  start - The beginning index, inclusive.
+    end - The ending index, exclusive.
+    str - String that will replace previous contents.
+    Returns:
+    This object.
+  ,*/
+#+END_SRC
+#+BEGIN_SRC java
+
+  public void setCharAt(int index,
+                        char ch)
+  /*The character at the specified index is set to ch. This sequence is altered to represent
+    a new character sequence that is identical to the old character sequence, except that it
+    contains the character ch at position index.
+   ,*/
+#+END_SRC
+**** 反转
+** StringBuilder
+与 =StringBuffer= 相同，但不保证同步
+** 基本数据类型包装类
+| 基本数据类型 | 引用数据类型 |
+| byte         | Byte         |
+| short        | Short        |
+| int          | Integer      |
+| long         | Long         |
+| boolean      | Boolean      |
+| double       | Double       |
+| char         | Character    |
+基本数据包装类最主要作用: 与字符串之间互相转换
+*** 基本数据类型 -> 字符串
+基本数据类型+""
+基本数据类型.toString(基本数据类型值)
+#+BEGIN_SRC java
+  Interger.toString(32);
+#+END_SRC
+*** 字符串 -> 基本数据类型
+#+BEGIN_SRC java
+  public static int parseInt(String s)
+      throws NumberFormatException
+#+END_SRC
+十进制转成其他进制
+#+BEGIN_EXAMPLE
+  toBinaryString();
+  toOctalString();
+  toHexString();
+#+END_EXAMPLE
+其他进制转成十进制
+#+BEGIN_EXAMPLE
+  parseInt(String s, int radix);
+#+END_EXAMPLE
+#+BEGIN_SRC java
+  int x = parseInt("110", 10);
+#+END_SRC
+*** 自动装箱和自动拆箱
+#+BEGIN_SRC java
+  Integer x = 4; // x 自动装箱 new Interger(4)
+  x = x + 2; // x 进行自动拆箱，变成 int 类型，与 2 相加，然后自动装箱赋给 x
+#+END_SRC
+注意:
+1. 自动装箱可能出现空指针异常，需要进行判断，避免出现问题
+   #+BEGIN_SRC java
+     Integer x = null; //x 可以设置为空
+     x = x + 2; // 此时会抛空指针异常
+   #+END_SRC
+2. 如下代码
+   #+BEGIN_SRC java
+     Integer m = 128;
+     Integer n = 128;
+
+     System.out.println("m==n: "+(m==n));
+
+     Integer a = 127;
+     Integer b = 127;
+     System.out.println("a==b: "+(a==b));
+   #+END_SRC
+   m==n 会输出 ’False'，因为是两个对象，而对于 a==b，输出是 'True'，这是因为当数值在 byte 范围内时，
+   对于新特性，如果数值已经存在，则不再开辟新的空间。
+* 集合框架 
+** 体系概述
+集合: 集合可以存储对象，长度可变，与数组相比，数组长度不可变，数组可以存储基本数据类型，而集合只能存储对象
+集合框架: 对于集合共性不断抽取，形成各种体系，称之为集合框架，集合顶层是 =Collection=
+#+BEGIN_EXAMPLE
+  Collection ----> List --> ArrayList 
+   |                |    |
+   |                |    --> Vector
+   |                v
+   v              LinkedList
+   Set --> HashSet
+   |
+   |
+   v
+   TreeSet
+#+END_EXAMPLE
+数据结构: 每个容器存储方式不同，不同的存储方式称之为数据结构
+** 共性方法
+*** 增
+#+BEGIN_SRC java
+  boolean add(E e)
+  /* Ensures that this collection contains the specified element (optional operation).
+     Returns true if this collection changed as a result of the call.
+     (Returns false if this collection does not permit duplicates and already contains the specified element.)
+  ,*/
+#+END_SRC
+#+BEGIN_SRC java
+  boolean addAll(Collection<? extends E> c)
+  /*Adds all of the elements in the specified collection to this collection (optional operation).
+    The behavior of this operation is undefined if the specified collection is modified while the
+    operation is in progress. (This implies that the behavior of this call is undefined if the
+    specified collection is this collection, and this collection is nonempty.)
+  ,*/
+#+END_SRC
+*** 删
+#+BEGIN_SRC java
+  void clear()
+  /*Removes all of the elements from this collection (optional operation).
+    The collection will be empty after this method returns.
+  ,*/
+#+END_SRC
+#+BEGIN_SRC java
+  boolean remove(Object o)
+  /*Removes a single instance of the specified element from this collection,
+    if it is present (optional operation). More formally, removes an element e such that
+    (o==null ? e==null : o.equals(e)), if this collection contains one or more such elements.
+    Returns true if this collection contained the specified element (or equivalently,
+    if this collection changed as a result of the call).
+  ,*/
+#+END_SRC
+#+BEGIN_SRC java
+  boolean removeAll(Collection<?> c)
+  /*    Removes all of this collection's elements that are also contained in the specified collection
+        (optional operation). After this call returns, this collection will contain no elements in
+        common with the specified collection.
+   ,*/
+#+END_SRC
+*** 改
+#+BEGIN_SRC java
+  boolean retainAll(Collection<?> c)
+  /*Retains only the elements in this collection that are contained in the specified
+    collection (optional operation). In other words, removes from this collection all
+    of its elements that are not contained in the specified collection.
+  ,*/
+#+END_SRC
+*** 查
+#+BEGIN_SRC java
+  boolean contains(Object o)
+  /* Returns true if this collection contains the specified element. More formally,
+     returns true if and only if this collection contains at least one element e such
+     that (o==null ? e==null : o.equals(e)).boolean contains(Object o)
+  ,*/
+#+END_SRC
+#+BEGIN_SRC java
+  boolean containsAll(Collection<?> c)
+  //Returns true if this collection contains all of the elements in the specified collection.
+#+END_SRC
+#+BEGIN_SRC java
+  boolean isEmpty()
+  //Returns true if this collection contains no elements.
+#+END_SRC
+#+BEGIN_SRC java
+  Iterator<E> iterator()
+  /*Returns an iterator over the elements in this collection.
+    There are no guarantees concerning the order in which the elements
+    are returned (unless this collection is an instance of some class that provides a guarantee).
+   ,*/
+#+END_SRC
+**** 对于 =Iterator=, 具有如下方法
+#+BEGIN_SRC java
+  boolean hasNext()
+  /*Returns true if the iteration has more elements.
+    (In other words, returns true if next() would return an element rather than throwing an exception.)
+   ,*/
+#+END_SRC
+#+BEGIN_SRC java
+  E next()
+  //Returns the next element in the iteration.
+#+END_SRC
+#+BEGIN_SRC java
+  default void remove()
+  /*    Removes from the underlying collection the last element returned by this iterator
+        (optional operation). This method can be called only once per call to next().
+        The behavior of an iterator is unspecified if the underlying collection is modified
+        while the iteration is in progress in any way other than by calling this method.
+  ,*/
+
+#+END_SRC
+** =List= 共性方法
+*** =List= 和 =Set= 区别
++ =List= 元素有序，可重复，因为该集合体系有索引
++ =Set= 无序排列，元素不可重复
+*** =List= 共性方法
+凡是可以操作角标的方法都是该体系特有方法
+**** 增
+=add()= =addAll()=
+#+BEGIN_SRC java
+  boolean add(E e)
+  //Appends the specified element to the end of this list (optional operation).
+#+END_SRC
+#+BEGIN_SRC java
+  boolean addAll(Collection<? extends E> c)
+  /*    Appends all of the elements in the specified collection to the end of this list,
+        in the order that they are returned by the specified collection's iterator (optional operation).
+        The behavior of this operation is undefined if the specified collection is modified while the
+        operation is in progress. (Note that this will occur if the specified collection
+        is this list, and it's nonempty.)
+   ,*/
+#+END_SRC
+#+BEGIN_SRC java
+  void add(int index,
+           E element)
+  /*Inserts the specified element at the specified position in this list (optional operation).
+    Shifts the element currently at that position (if any) and any subsequent elements to the
+    right (adds one to their indices).
+  ,*/
+#+END_SRC
+**** 删
+=remove()=
+**** 改
+=set()= 
+=sublist()=
+#+BEGIN_SRC java
+  E set(int index,
+        E element)
+  /*Replaces the element at the specified position in this list 
+  with the specified element (optional operation).
+  */
+#+END_SRC
+#+BEGIN_SRC java
+  List<E> subList(int fromIndex,
+                  int toIndex)
+  /*Returns a view of the portion of this list between the specified fromIndex, inclusive, and toIndex, exclusive.
+    (If fromIndex and toIndex are equal, the returned list is empty.)
+    The returned list is backed by this list, so non-structural changes in the returned list
+    are reflected in this list, and vice-versa.
+    The returned list supports all of the optional list operations supported by this list.
+   ,*/
+#+END_SRC
+**** 查
+=get()= =indexOf()= =iterator()= =listIterator()= 
+#+BEGIN_SRC java
+  E get(int index)
+  //Returns the element at the specified position in this list.
+#+END_SRC
+注意:
+#+BEGIN_SRC java
+  Iterator it = a1.iterator();
+  while(it.hasNext()){
+      Object obj = it.next();
+      if(obj == "java01"){
+          a1.add("java02");
+      }
+      System.out.println(a1);
+  }
+#+END_SRC
+以上语句会出现错误 =java.util.ConcurrentModificationException=
+以上语句一边取元素，一边添加元素，并发修改会造成此种错误 
+以下代码中，会输出不同结果
+#+BEGIN_SRC java
+  // a1.add("java01")
+  // a1.add("java02")
+  // a1.add("java03")
+  // a1.add("java04")
+  Iterator it = a1.iterator();
+  while(it.hasNext()){
+      Object obj = it.next();
+      if(obj == "java01"){
+          it.remove();
+      }
+      System.out.println(obj);
+    }
+
+  System.out.println(a1);
+#+END_SRC
+#+BEGIN_EXAMPLE
+  java01
+  java02
+  java03
+  java04
+  ["java02", "java03", "java04"]
+#+END_EXAMPLE
+总结：
+在迭代时，不可以通过集合对象的方法操作集合中的元素，因为会发生 =ConcurrentModificationException=
+因此，在迭代时，只能用迭代器的方法操作元素，然后 =Iterator= 方法有限，只能进行判断、取出和删除的操作，如果需要
+添加修改的操作，就需要使用其子接口 =listIterator()= 方法获取
+#+BEGIN_SRC java
+  ListIterator it = a1.listIterator();
+  while(it.hasNext()){
+      Object obj = it.next();
+      if(obj == "java01"){
+          li.add("java02");
+      }
+      System.out.println(a1);
+    }
+#+END_SRC
+** =List= 常用的三个子类
+*** =ArrayList=
+数据结构用的数组结构，线程不同步，特点在于查询速度很快，修改很快，增删很慢
+*** =LinkedList=
+数据结构采用链表结构，特点在于查询很慢，增删很快
+*** =Vector=
+底层是数组数据结构，实现是线程同步的

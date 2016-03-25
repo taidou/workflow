@@ -1,0 +1,10 @@
+#+TITLE: 日记
+#+AUTHOR: 胡琛
+#+CAPTION: 当他回首往事的时候，他不会因虚度年华而悔恨，也不会因碌碌无为而羞耻
+
+* March 25th, 2016
+
+** Machine Learning
+
+*** 决策树
+复习，笔记整理

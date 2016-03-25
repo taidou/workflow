@@ -1,0 +1,1816 @@
+* 安装与 HelloWorld
+** 安装
+1. Windows
+   安装 =.exe= 文件，注意勾选 =Add Python3.5 to PATH=
+2. Linux
+** 解释器
+1. 官方的解释器 =CPython=, 从 =Python= 官网下载并安装好 =Python= 后，我们就得到一个官方解释器 =CPython=
+2. =IPython= 是在 =CPython= 基础上进行了增强， =CPython= 提示符是 '>>>', 而 =IPython= 提示符是 'In[序号]'
+3. =PyPy= 使用 =JIT= 技术进行动态编译，可以提高代码执行速度
+4. =JPython= 是运行在 =Java= 平台上的 =Python= 解释器，可以将 =Python= 编译成 =Java= 字节码文件执行
+5. =IronPython= 是运行在 =.Net= 平台上的 =Python= 解释器
+** Hello World
+1. 交互命令下，直接输入指令即可
+   #+BEGIN_EXAMPLE
+     Python 3.5.1 (default, Dec  7 2015, 12:58:09) 
+     [GCC 5.2.0] on linux
+     Type "help", "copyright", "credits" or "license" for more information.
+     >>> 100+200
+     300
+     >>> print("hello world")
+     hello world
+     >>> 
+   #+END_EXAMPLE
+2. 编辑后缀名为 =.py= 的文件
+   #+BEGIN_SRC python
+     #!/usr/bin/env python
+     #
+     print ("hello world")
+   #+END_SRC
+   然后在终端中直接利用 =Python= 执行
+   #+BEGIN_SRC shell
+     python hello.py
+   #+END_SRC
+* 基础概念
+** 语法要点
+1. 代码风格
+   采用缩进方式，譬如以下代码
+   #+BEGIN_SRC python
+     #print absolute value
+     a = 100
+     if a > 0:
+         print (a)
+     else:
+         print (-a)
+   #+END_SRC
+2. 注释
+   以 '#' 开头的那行语句是注释
+** 数据类型 
+*** 基础数据类型 
+1. 整数
+2. 浮点数
+3. 字符串
+   以 单引号 ('') 或 双引号 ("") 括起来的内容
+   转义的说明: 默认字符串中类似'\t''\n'等会进行转义，如果需要输出 '\' 符号，则需要输入 '\\'，
+   如果需要输入很多 '\' 表示不转义的话，可以使用 (r'') 进行反反转义。
+4. 布尔型
+   布尔型只有 'True' 和 'False' 两种值，可以使用 'and' 'or' 'not' 进行运算
+5. 空值
+   是 =Python= 的一种特殊的值，可以用 'None' 表示，需要注意的是 'None' 不等同于 '0', '0' 是有意义的
+*** 变量
+可以是任意数据类型，是英文、数字和 '_' 的组合，但数字不能作为开头。
+**** 注意
+#+BEGIN_SRC python
+  a = 'ABC'
+  b = a
+  a = 'XYZ'
+  print(b)
+#+END_SRC
+以上输出是 ’ABC'，原因如下:
+[[file:python/varstr_01.png]]
+[[file:python/varstr_02.png]]
+[[file:python/varstr_03.png]]
+*** 常量
+=Python= 没有任何机制保证常量不能被更改，但是习惯上用全部大写的字母表示常量
+*** 注意点
+=Python= 中的除法分为普通除法 '/' 和地板除 '//'，如果用普通除法 '/'，则无论除数和被除数是否尾整数，
+结果都是浮点型，如果用地板除 '//', 则如果除数和被除数均为整数时，结果为整数。
+** 字符串和编码
+*** =ASCII= 编码
+用一个字节表示大小写英文字母、数字和一些符号
+*** =Unicode= 编码通常是两个字节，某些生僻字则用4个字节表示
+把所有语言统一到一套编码中，通常用两个字节表示一个字符，某些生僻字可能用到4个字节
+*** =UTF-8= 编码
+为了节约 =Unicode= 编码存储空间，又出现了 =UTF-8= 编码，将 =Unicode= 字符根据不同数字大小编码成
+1-6 个字节，常用的英文字符编码为一个字节，汉字通常为 3 个字节，只有很生僻的字才会被编码成 4-6 个字节。
+**** 用记事本编辑、存储过程
+[[file:python/encode_01.png]]
+**** 浏览网页时，编码转换
+[[file:python/encode_02.png]]
+*** =Python= 的编码
+1. 最新的 =Python3.5=, 字符串以 =Unicode= 编码。此外， =Python= 提供了 =ord()= 获取字符的整数表示，
+   =chr()= 将编码转换为对应的字符
+2. 由于 =str= 在内存中以 =Unicode= 表示，如果需要保存到磁盘或者在网络上传输，就需要将 =str= 变为字节
+   为单位的 =bytes=, =Python= 对 =bytes= 类型数据用带 'b' 前缀的单引号或双引号表示。
+   #+BEGIN_SRC python
+     x=b'ABC'
+   #+END_SRC
+   注意 'ABC' 和 b'ABC' 的差别，前者是 =str=, 后者虽然内容和前者相同，但 =bytes= 每个字符只占用一个字节。
+*** 格式化
+类似于 C 语言
+#+BEGIN_SRC java
+  print('hello %s'%'world')
+#+END_SRC
+** =list= 和 =tuple=
+*** =list=
+长度可变的有序集合，可以随时添加和删除其中的元素
+#+BEGIN_SRC java
+  classmates=['Michael', 'Bob', 'Tracy']
+#+END_SRC
+1. 利用 =len()= 可以获取 =list= 元素个数
+2. 利用下标来索引元素，元素索引从 0 开始
+3. 利用 =append()= 给 =list= 末尾追加元素
+4. 利用 =insert()= 将元素插入到指定位置
+   #+BEGIN_SRC java
+     classmates.insert(1, 'Jack')
+   #+END_SRC
+5. 利用 =pop()= 删除 =list= 末尾的元素
+6. 利用 =pop(i）= 删除指定位置元素， =i= 是索引位置
+7. =list= 元素也可以是 =list=
+*** =tuple=
+=tuple= 类似 =list=, 但是一旦初始化就不能修改，譬如
+#+BEGIN_SRC java
+  classmates=('Michael', 'Bob', 'Tracy')
+#+END_SRC
+1. 能用 =tuple= 替代 =list= 就尽量使用 =tuple=, 因为 =tuple= 不可变，更安全
+2. =tuple= 不可变，因此定以下的时候需要把元素确定下来
+   注意:
+   如果定义一个元素的 =tuple=, 为了避免与普通数字混淆，应该加一个逗号
+   #+BEGIN_SRC java
+     t=(1,)
+   #+END_SRC
+3. =tuple= 中可以包含 =list=, =list= 可以添加元素
+** 条件判断
+#+BEGIN_SRC python
+  age = 3
+  if age >= 18:
+      print('adult')
+  elif age >= 6:
+      print('teenager')
+  else:
+      print('kid')
+#+END_SRC
+** 循环
+1. =for...in= 循环，将 =list= 或 =tuple= 中每个元素迭代出来
+   =range()= 函数，可以生成整数序列， =list()= 可以将序列转换为 =list=
+   #+BEGIN_SRC python
+     #print sum of integer within 100 including 100
+     sum = 0
+     for i in list(range(101)):
+         sum += i
+     print ('sum = %d' % sum)
+   #+END_SRC
+2. =while= 循环
+   #+BEGIN_SRC python
+     #!/usr/bin/env python
+     #
+     # print sum of odd number within 100
+     sum = 0
+     i = 0
+     while (i < 101):
+         if(i%2 != 0):
+             sum += i
+         i+=1
+     print ('sum = %d' %sum)
+   #+END_SRC
+** =dict= 和 =set=                                                   :难点:
+*** =dict=
+键-值对应集合，查找速度很快
+#+BEGIN_SRC python
+  d = {'Michael':95, 'Bob':75, 'Tracy':85}
+#+END_SRC
+1. 可以通过 =key= 索引 =dict= 元素和赋值
+   #+BEGIN_SRC python
+     d['Michael'] = 90
+   #+END_SRC
+2. 通过 =get(key)= 获取 =value=
+3. 可以通过 =pop(key)= 方法删除元素
+4. 与 =list= 比较
+   =dict= 特点:
+   A. 查找插入速度极快，不会随 =key= 增加而增加
+   B. 内存占用较多
+   =list= 特点:
+   A. 查找和插入随元素增加而变慢
+   B. 内存占用较少
+*** =set=
+与 =dict= 类似，也是一组 =key= 集合，但不存储 =value=, 由于 =key= 不重复，因此 =set= 中没有重复的 =key=
+#+BEGIN_SRC python
+  s=set([1,1,2,2,3,3])
+#+END_SRC
+此时输出为
+#+BEGIN_EXAMPLE
+  >>> s=set([1,1,2,2,3,3])
+  >>> s
+  {1, 2, 3}
+#+END_EXAMPLE
+注意: 此时重复元素自动被过滤
+1. =add(key)= 方法可以添加元素到 =set= 中
+2. =remove(key)= 方法可以删除元素
+3. 两个 =set= 可以做交集、并集操作
+   #+BEGIN_EXAMPLE
+     >>> s1 = set([1, 2, 3])
+     >>> s2 = set([2, 3, 4])
+     >>> s1 & s2
+     {2, 3}
+     >>> s1 | s2
+     {1, 2, 3, 4}
+   #+END_EXAMPLE
+*** 不可变对象
+对于以下代码的说明:
+#+BEGIN_EXAMPLE
+  >>> a='ABC'
+  >>> a.replace('A','a')
+  'aBC'
+  >>> a
+  'ABC'
+#+END_EXAMPLE
+其中，'a' 是变量，而 'ABC' 是字符串常量， =replace()= 方法其实是将 'ABC' 复制了一份，将其中的 'A' 变为了 'a'，此时
+'a' 指向的 'ABC' 并没有变化。
+* 函数
+** 调用函数
+** 定义函数
+使用 =def= 语句，依次写出函数名，括号，括号中的参数和冒号
+#+BEGIN_SRC python
+
+  def myabs(x):
+      if x >= 0:
+          return x
+      else:
+          return (-x)
+#+END_SRC
+*** 空函数:
+如果想要定义一个什么也不做的函数，可以使用 =pass= 语句
+#+BEGIN_SRC python
+  def nop():
+      pass
+#+END_SRC
+其中， =pass= 可以作为占位符，测试代码是否有语法错误
+*** 参数检查
+调用函数的参数个数如果不对，会抛出 =TypeError=, 如果传入参数类型不对， =Python= 解释器不会检查出
+这种错误，需要我们自己定义
+#+BEGIN_SRC python
+
+  def my_abs(x):
+      if not isinstance(x, (int, float)):
+          raise TypeError('bad operande type')
+      if x >= 0:
+          return x
+      else:
+          return -x
+#+END_SRC
+*** 返回多个值
+#+BEGIN_SRC python
+  import math
+
+  def move(x, y, step, angle = 0):
+      nx = x + step*math.cos(angle)
+      ny = y + step+math.sin(angle)
+      return nx, ny
+#+END_SRC
+** 函数参数                                                     :重点:难点:
+*** 位置参数
+调用函数的时候，按照函数定义时，位置参数顺序依次传入参数
+*** 默认参数
+**** 注意
+1. 必选参数在前，默认参数在后
+2. 默认参数设置时，变化大的参数放前面，变化小的参数放后面，变化小的参数可以作为默认参数
+3. 默认参数必须指向不变对象
+   说明:
+   譬如以下代码
+   #+BEGIN_SRC python
+     def add_end(L=[]):
+         L.append('END')
+         print(L)
+
+     add_end()
+     add_end()
+   #+END_SRC
+   结果输出结果为:
+   #+BEGIN_EXAMPLE
+     >>> ['END']
+     >>> ['END','END']
+   #+END_EXAMPLE
+   =L= 是引用型变量，存储的是地址值，它指向 '[]'，如果 '[]' 的值变化了，但是首地址不变，此时 =L= 仍然指向该
+   地址，因此，此时默认变量不再是 '[]' 了，而是 '['END']
+   对以上代码，可做如下修改
+   #+BEGIN_SRC python
+     def add_end(L=None):
+         if L is None:
+             L = []
+         L.append('END')
+         return L
+   #+END_SRC
+**** 示例
+要写个一年级小学生入学注册的函数
+#+BEGIN_SRC python
+  def enroll(name, gender, age=6, city='Nanjing'):
+      print('name: ', name)
+      print('gender: ', gender)
+      print('age: ', age)
+      print('city: ', city)
+#+END_SRC
+*** 可变参数
+传入的参数个数可变
+**** 示例
+计算 $a^2+b^2+c^2+\cdots$
+方法一 传入 =list= 或 =tuple=
+        #+BEGIN_SRC python
+          def calc(numbers):
+              sum = 0
+              for n in numbers:
+                  sum = sum + n*n
+              return sum
+        #+END_SRC
+        但是需要将传入参数组装为 =list= 或 =tuple= 才行，譬如
+        #+BEGIN_SRC python
+          calc([1,2,3])
+        #+END_SRC
+方法二 可变参数
+      #+BEGIN_SRC python
+        def calc(*numbers):
+            sum = 0
+            for n in numbers:
+                sum = sum + n*n
+            return sum
+      #+END_SRC
+      此时，可以简单的传入参数即可
+      #+BEGIN_SRC python
+        calc(1,2,3)
+      #+END_SRC
+说明: 如果对于定义了可变参数的函数，需要传入 =list= 或 =tuple=, 可以在 =list= 或 =tuple= 名前加一个 '*'
+#+BEGIN_SRC python
+  t = (1, 2, 3)
+  calc(*t)
+#+END_SRC
+*** 关键字参数
+可变参数允许传入0个或任意个参数，在函数内部组装为一个 =tuple= 进行计算，而关键字参数则允许传入 0 个或任意个
+含参数名的参数，这些关键字参数在函数内部组装为一个 =dict=
+#+BEGIN_SRC python
+  def person(name, age, **other):
+      print('name: ', name, 'age: ', age, 'other: ', other)
+#+END_SRC
+使用时，会有以下输出
+#+BEGIN_EXAMPLE
+  >>> person('Hu', 28, city='Nanjing')
+  name:  Hu age:  28 other:  {'city': 'Nanjing'}
+  >>> person('Shao', 27, city='Suzhou', gender='F')
+  name:  Shao age:  27 other:  {'city': 'Suzhou', 'gender': 'F'}
+#+END_EXAMPLE
+对于 =other= 参数，可以直接传入 =dict= 名
+#+BEGIN_EXAMPLE
+  >>> extra={'gender':'F', 'city':'Suzhou'}
+  >>> person('Shao', 27, **extra)
+  name:  Shao age:  27 other:  {'city': 'Suzhou', 'gender': 'F'}
+#+END_EXAMPLE
+**** 使用场景
+如果需要做一个用户注册功能，其中，姓名与年龄为必填项，其他信息为选填项，则可以使用 =关键字参数= 来实现选填功能
+*** 命名关键字参数
+对于 =关键字参数=, 如果需要限制传入的参数，则可以使用 =命名关键字参数=, 对于以上定义的 =person()= 函数，
+如果只想接受 'city' 和 'gender' 两个参数，可以对 =person()= 做如下修改
+#+BEGIN_SRC python
+  def person(name, age, *, gender, city):
+      print('name: ', name, 'age: ', age, 'gender: ', gender, 'city: ', city)
+#+END_SRC
+调用时，需要有参数名，否则会报错
+#+BEGIN_EXAMPLE
+  person('Shao', 27, gender='F', city='Suzhou')
+#+END_EXAMPLE
+对于 =命名关键字参数=, 可以设置默认参数值
+*** 参数组合
+以上参数可以组合，但是必须遵照一定顺序: 必选参数、默认参数、可变参数/命名关键字参数和关键字参数
+** 递归函数
+在函数名调用本函数，譬如计算阶乘，汉诺塔
+* 高级特性
+** 切片
+#+BEGIN_SRC python
+  L=[0,1,2,3,4,5]
+  L1=L[1:2]
+#+END_SRC
+这样输出 =L1= 结果是
+#+BEGIN_EXAMPLE
+  >>> [1]
+#+END_EXAMPLE
+对于 =list= 或 =tuple= 切换是用 '[i1:i2:step]'，表示从 i1 取到 i2 元素，但是不包含 i2 元素，而且取得间隔为 'step'
+** 迭代 (Iteration)
+只要对象是可迭代的，就可以通过 =for...in= 循环进行迭代
+*** 可迭代对象
+判断对象是否可迭代，可以通过 =collections= 模块中的 =Iterable= 
+#+BEGIN_EXAMPLE
+  >>> from collections import Iterable
+  >>> isinstance('abc', Iterable)
+  True
+  >>> isinstance([1,2,3], Iterable)
+  True
+  >>> isinstance(123, Iterable)
+  False
+#+END_EXAMPLE
+*** 实现类似 =Java= 一样的下标循环
+=Python= 内置的 =enumerate()= 函数可以把一个 =list= 变为索引-元素对，这样就可以在 for 循环中同时迭代索引和元素本身
+#+BEGIN_EXAMPLE
+  >>> for i, value in enumerate('ABC'):
+  ...     print(i, value)
+  ... 
+  0 A
+  1 B
+  2 C
+#+END_EXAMPLE
+** 列表生成器
+1. 生成从 1 到 100 的 =list=
+   #+BEGIN_SRC python
+     L=list(range(1, 101))
+   #+END_SRC
+2. 生成 1 到 100 整数平方组成的 =list=
+   #+BEGIN_SRC python
+     l=list(x*x for x in range(1, 101))
+   #+END_SRC
+   或
+   #+BEGIN_SRC python
+     [x*x for x in range(1,101)]
+   #+END_SRC
+3. 生成1 到 100 所有偶数的平台组成的 =list=
+   #+BEGIN_SRC python
+     [x*x for x in range(1,101) if x%2==0]
+   #+END_SRC
+4. 使用双层循环生成全排列
+   #+BEGIN_SRC python
+     [m+n for m in 'ABC' for n in 'XYZ']
+   #+END_SRC
+5. 将一个字符串中的所有字母变为小写
+   #+BEGIN_SRC python
+     L=['Hello', 'World', 'IBM', 'Apple']
+     [s.lower() for s in L]
+   #+END_SRC
+** 生成器
+列表元素根据某种算法不断推算出来，不创建完整 =list=, 从而节省大量内存空间的机制，成为生成器
+1. 将列表生成式的 [] 改为 ()，就创建了一个 =generator=
+   通过 =next()= 函数可以不断打印出生成的元素
+2. 生成斐波那契数列
+   #+BEGIN_SRC python
+     def fib(max):
+         n,a,b=0,0,1
+         while n < max:
+             print(b)
+             a,b=b,a+b
+             n=n+1
+         return 'done'
+   #+END_SRC
+3. =yield= 关键字
+   函数是顺序执行，遇到 =return= 则返回，而对于 =generator= 则是，每次调用 =next()= 执行，遇到
+   =yield= 语句返回，再次执行则从上次返回的 =yield= 语句处继续执行
+   #+BEGIN_SRC python
+     def odd():
+         print('step 1')
+         yield 1
+         print('step 2')
+         yield 3
+         print('step 3')
+         yield 5
+   #+END_SRC
+   此时调用 =odd()=
+   #+BEGIN_EXAMPLE
+     >>> o = odd()
+     >>> next(o)
+     step 1
+     1
+     >>> next(o)
+     step 2
+     3
+     >>> next(o)
+     step 3
+     5
+     >>> next(o)
+     Traceback (most recent call last):
+       File "<stdin>", line 1, in <module>
+     StopIteration
+   #+END_EXAMPLE
+4. 用 =generator= 后，基本不会用 =next()= 来获取下一个返回值，而是直接使用 =for= 循环
+   #+BEGIN_EXAMPLE
+     >>> for n in fib(6):
+     ...     print(n)
+     ... 
+     1
+     1
+     2
+     3
+     5
+     8
+     d
+     o
+     n
+     e
+   #+END_EXAMPLE
+5. 用 =for= 循环调用 =generator= 拿不到 =return= 语句的返回值，如果要拿到返回值，必须捕获 =StopIteration= 错误，
+   返回值包含在 =StopIteration= 的 =value= 中
+   #+BEGIN_EXAMPLE
+     >>> g = fib(6)
+     >>> while True:
+     ...     try:
+     ...         x = next(g)
+     ...         print('g:', x)
+     ...     except StopIteration as e:
+     ...         print('Generator return value:', e.value)
+     ...         break
+     ...
+     g: 1
+     g: 1
+     g: 2
+     g: 3
+     g: 5
+     g: 8
+     Generator return value: done
+   #+END_EXAMPLE
+** 迭代器
+*** 注意: =Iterable= 与 =Iterator= 区分
+可以被 =next()= 函数调用并不断返回下一个值的对象称为迭代器
+#+BEGIN_EXAMPLE
+  >>> from collections import Iterator
+  >>> isinstance((x for x in range(10)), Iterator)
+  True
+  >>> isinstance([], Iterator)
+  False
+  >>> isinstance({}, Iterator)
+  False
+  >>> isinstance('abc', Iterator)
+  False
+#+END_EXAMPLE
+=list= =tuple= =str= 不是 =Iterator= 对象，但是可以通过 =iter()= 函数变为 =Iterator= 对象
+#+BEGIN_EXAMPLE
+  >>> isinstance(iter([]), Iterator)
+  True
+  >>> isinstance(iter('abc'), Iterator)
+  True
+#+END_EXAMPLE
+* 函数式编程
+** 说明
+函数式编程就是一种抽象程度很高的编程范式，纯粹的函数式编程语言编写的函数没有变量，因此，
+任意一个函数，只要输入是确定的，输出就是确定的，这种纯函数我们称之为没有副作用。而允许使用变量的程序设计语言，
+由于函数内部的变量状态不确定，同样的输入，可能得到不同的输出，因此，这种函数是有副作用的。
+函数式编程的一个特点就是，允许把函数本身作为参数传入另一个函数，还允许返回一个函数！
+** 高阶函数
+1. 变量可以指向函数
+2. 函数名也是变量
+3. 函数参数也可以是函数
+4. 可以接受函数为参数的函数，称为高阶函数
+   #+BEGIN_EXAMPLE
+     >>> def fun(a,b, f):
+     ...     return f(a)+f(b)
+     ... 
+     >>> fun(2,-3,abs)
+     5
+   #+END_EXAMPLE
+*** map/reduce                                                        :重点:难点:
+**** =map()=
+=map()= 函数接受两个参数，一个是函数，一个是 =Iterable=, =map()= 函数将传入的函数依次作用
+到序列的每个元素，并将结果作为新的 =Iterator= 返回。
+***** 示例
+将 $f(x) = x^2$ 作用到一个 =list= 上
+#+BEGIN_SRC python
+  def f(x):
+      return x*x
+#+END_SRC
+然后
+#+BEGIN_SRC python
+  r=map(f, [1,2,3,4,5,6]
+#+END_SRC
+之后就可以得到序列 [1,2,3,4,5,6] 的平方，因为得到的是 =Iterable=, 如果需要得到 =Iterable=
+#+BEGIN_SRC python
+  list(r)
+#+END_SRC
+**** =reduce()=
+=reduce()= 接受两个参数，一个函数，一个 =Iterable=, 函数必须接受两个参数，然后 =reduce()= 先将函数作用在
+序列的前两个元素上，将结果作用新的参数，和第三个参数作为新的两个参数，被函数作用，依此递归。
+#+BEGIN_SRC latex
+  reduce(f, [x_1, x_2, x_3, x_4]) = f(f(f(x_1,x_2), x_3), x_4)
+#+END_SRC
+***** 示例1
+对一个数列求和
+#+BEGIN_EXAMPLE
+  >>> from functools import reduce
+#+END_EXAMPLE
+#+BEGIN_SRC python
+  def add(x,y):
+      return x+y
+#+END_SRC
+然后
+#+BEGIN_EXAMPLE
+  >>> reduce(add, [1,2,3,4,5])
+#+END_EXAMPLE
+***** 示例2
+将字符串转为整型变量
+#+BEGIN_SRC python
+  def fn(x,y):
+      return x*10 + y
+#+END_SRC
+#+BEGIN_SRC python
+  def char2num(s):
+      return {'0':0, '1':1, '2':2, '3':3, '4':4, '5':5, '6':6, '7':7, '8':8, '9':9}[s]
+#+END_SRC
+#+BEGIN_EXAMPLE
+  >>> isinstance(reduce(fn, map(char2num, '11343')), int)
+  True
+#+END_EXAMPLE
+**** 练习1
+利用map()函数，把用户输入的不规范的英文名字，变为首字母大写，其他小写的规范名字。
+输入：['adam', 'LISA', 'barT']，输出：['Adam', 'Lisa', 'Bart']
+**** 练习2
+利用 =map()= 和 =reduce()= 写一个 =str2float()= 函数，能将类似 '123,456' 的字符串转换为浮点型 =123.456=.
+*** filter                                                           :重点:难点:
+接受两个参数，一个函数，一个 =Iterable=, 依此对序列每个元素用函数作用，根据返回的 =boolean= 值决定
+保留还是丢弃这个元素
+**** 示例
+保留一个字符序列中奇数
+#+BEGIN_SRC python
+  def is_odd(x):
+      return x%2==1
+#+END_SRC
+#+BEGIN_EXAMPLE
+  >>> list(filter(is_odd, [1,2,3,4,5])
+#+END_EXAMPLE
+**** 练习
+利用埃氏算法得到素数序列
+*** sorted
+可以接受 =key= 函数来实现自定义的排序
+#+BEGIN_EXAMPLE
+  >>> sorted([1,234,231,32.23,-12,23], key=abs)
+  [1, -12, 23, 32.23, 231, 234]
+#+END_EXAMPLE
+#+BEGIN_EXAMPLE
+  >>> sorted(['abc','Abc','Zdb',"wc"], key=str.lower)
+  ['abc', 'Abc', 'wc', 'Zdb']
+#+END_EXAMPLE
+如果需要逆序排列
+#+BEGIN_EXAMPLE
+  >>> sorted(['abc','Abc','Zdb',"wc"], key=str.lower, reverse=True)
+  ['Zdb', 'wc', 'abc', 'Abc']
+#+END_EXAMPLE
+** 返回函数
+高阶函数可以接收函数作为参数外，还可以把函数作为结果值返回
+*** 示例
+普通的求和函数
+#+BEGIN_SRC python
+  def sum(*args):
+      ax = 0
+      for n in args:
+          ax = ax+n
+      return ax
+#+END_SRC
+以上函数会直接求和，如果不需要立刻求和，可以做如下修改
+#+BEGIN_SRC python
+  def lazy_sum(*args):
+      def sum():
+          ax = 0
+          for n in args:
+              ax = ax+n
+          return ax
+      return sum
+#+END_SRC
+当调用 =lazy_sum()= 时，不会立刻求和，而且每次调用都会返回一个新的 =sum()= 函数，这种程序结构称之为 "闭包" 结构
+#+BEGIN_EXAMPLE
+  >>> f1=lazy_sum(1,3,5,7,9)
+  >>> f2=lazy_sum(1,3,5,7,9)
+  >>> f1
+  <function lazy_sum.<locals>.sum at 0x7f2a58a417b8>
+  >>> f2
+  <function lazy_sum.<locals>.sum at 0x7f2a58a41730>
+  >>> f1()
+  25
+  >>> f2()
+  25
+  >>> f1()==f2()
+  True
+  >>> f1==f2
+  False
+#+END_EXAMPLE
+*** 闭包
+使用闭包需要注意，返回函数不要引用任何循环变量，或者后续变化的变量，譬如以下例子:
+#+BEGIN_SRC python
+  def count():
+      fs = []
+      for i in range(1,4):
+          def f():
+              return i*i
+          fs.append(f) #注意: 这里添加的是函数 f，而不是函数值 f()
+      return fs
+#+END_SRC
+#+BEGIN_EXAMPLE
+  >>> f1,f2,f3=count()
+  >>> f1()
+  9
+  >>> f2()
+  9
+  >>> f3()
+  9
+#+END_EXAMPLE
+出现以上结果是因为返回函数引用了循环变量，但它并非立刻执行，等到三个函数都返回时，值 =i= 已经变成了 3
+对以上函数可以进行修改，再创建一个函数，用该函数的参数绑定循环变量当前的值，无论循环变量后续如何改变，都
+已经绑定到函数参数上了。
+#+BEGIN_SRC python
+  def count():
+      def f(i):
+          def g():
+              return i*i
+          return g
+      fs = []
+      for i in range(1,4):
+          fs.append(f(i)) # f(i) 立刻被执行，因此， i 的当前值被传入 f()
+      return fs
+#+END_SRC
+执行结果
+#+BEGIN_EXAMPLE
+  >>> f1, f2, f3 = count()
+  >>> f1()
+  1
+  >>> f2()
+  4
+  >>> f3()
+  9
+#+END_EXAMPLE
+** 匿名函数
+关键字 =lambda= 表示匿名函数， =lambda= 后跟函数参数， 冒号后跟表达式。匿名函数只能有一个表达式。
+** 装饰器
+在代码运行期间，动态增加功能的方式，称之为 "装饰器" (=decorator=). 本质上，一个装饰器就是一个返回函数的高阶
+函数。
+*** 示例
+有 =now()= 函数，会打印日期
+#+BEGIN_SRC python
+  def now():
+      print('2016-1-20')
+#+END_SRC
+如果需要得到函数名，可以
+#+BEGIN_SRC python
+  def log(func):
+      def wrapper(*args, **kw):
+          print('call %s(): '%func.__name__)
+          return func(*args, **kw)
+      return wrapper
+#+END_SRC
+上述代码中， =log= 是一个装饰器，所以接受一个函数作为参数，并返回一个函数。使用时，利用 =Python= 的 =@= 语法，
+将 =decorator= 置于函数的定义处。
+#+BEGIN_SRC python
+  @log
+  def now():
+      print('2016-1-20')
+#+END_SRC
+然后，当调用 =now()= 函数时，会有以下输出
+#+BEGIN_EXAMPLE
+  >>> @log
+  ... def now():
+  ...     print('2016-1-20')
+  ... 
+  >>> now()
+  call now: 
+  2016-1-20
+#+END_EXAMPLE
+将 =@log= 放在 =now()= 函数上面，相当于执行 =log(now)=, 有时候， =decorator= 本身需要参数，需要编写一个返回
+=decorator= 的高阶函数
+#+BEGIN_SRC python
+  def log(text):
+      def decorator(func):
+          def wrapper(*args, **kw):
+              print("%s %s(): "%(text, func.__name__))
+              return func(*args, **kw)
+          return wrapper
+      return decorator
+#+END_SRC
+使用时
+#+BEGIN_EXAMPLE
+  >>> @log("execute")
+  ... def now():
+  ...     print('2016-01-20')
+  ... 
+  >>> now()
+  execute now(): 
+  2016-01-20
+#+END_EXAMPLE
+首先执行 =log('execute')= ，返回的是 =decorator= 函数，再调用返回的函数，参数是now函数，返回值最终是wrapper函数。
+经过装饰的函数，因为返回的是 =wrapper()= 函数，因此，此时的 =func.__name__= 已经变成了 'wrapper' 了
+#+BEGIN_EXAMPLE
+  >>> now.__name__
+  'wrapper'
+#+END_EXAMPLE
+为了使得装饰函数不修改被装饰的函数 =now()= 的函数名，可以利用 =Python= 内置的 =functools.wraps=，于是，一个完整
+的 =decorator= 写法如下:
+#+BEGIN_SRC python
+  import functools
+
+  def log(text):
+      def decorator(func):
+          @functools.wraps(func)
+          def wrapper(*args, **kw):
+              print("%s %s(): "%(text, func.__name__))
+              return func(*args, **kw)
+          return wrapper
+      return decorator
+#+END_SRC
+*** 练习
+在函数调用前后打印出 "begin call" 和 "end call"
+** 偏函数
+通过默认参数，可以减少函数调用难度，而偏函数也可以做到这一点
+*** 示例
+=Python= 自带函数 =int()= 可以将字符串转换为 =int= 型变量，可以设置进制
+#+BEGIN_EXAMPLE
+  >>> int("111")
+  111
+  >>> int("111",base=2)
+  7
+  >>> int("111",base=16)
+  273
+#+END_EXAMPLE
+如果对于一些二进制数，都想变成十进制，每次都设置参数 'base=2' 比较麻烦，可以利用 =functools.partial= 定义一个
+=int2= 函数如下
+#+BEGIN_EXAMPLE
+  >>> import functools
+  >>> int2=functools.partial(int, base=2)
+  >>> int2("111")
+  7
+#+END_EXAMPLE
+此时， =int2= 函数还可以使用其他进制转换
+#+BEGIN_EXAMPLE
+  >>> int2("111", base=16)
+  273
+#+END_EXAMPLE
+=int2= 等价于
+#+BEGIN_SRC python
+  def int2:
+      return int(x, base=2)
+#+END_SRC
+*** 说明
+偏函数实际可以接收函数对象、 =*args=, =**kw= 这三个参数
+对以上例子，实际上相当于固定了 =int()= 函数的关键字参数 =base=, 也就是
+#+BEGIN_SRC python
+  kw={'base':2}
+  int('111', **kw)
+#+END_SRC
+而如以下例子
+#+BEGIN_SRC python
+  max2 = functools.partial(max, 10)
+#+END_SRC
+相当于将 10 作为 =args= 一部分，自动加到左边，此时
+#+BEGIN_SRC python
+  max2(5,6,7)
+#+END_SRC
+相当于
+#+BEGIN_SRC python
+  max(10,5,6,7)
+#+END_SRC
+* 模块
+** 说明
+在 =Python= 中，一个 =.py= 文件就是一个模块，使用模块的好处是提高了代码维护性，为了避免了名字冲突， =Python= 又
+引入了按目录来组织模块的方法， 称之为包 (=package=)
+=Python= 中， 一个 =abc.py= 就是一个名字叫做 =abc= 的模块，一个 =xyz.py= 就是一个名字叫做 =xyz= 的模块
+** 包 (=package=)
+如果 =abc= 和 =xyz= 这两个模块与其他模块冲突了，可以通过包来组织模块，避免冲突。
+*** 方法
+设置一个顶层包名，譬如 =mycompany=, 在 =mycompany= 目录中存放 =abc.py= 和 =xyz.py=, 此时就有 =mycompany.abc=
+和 =mycompany.xyz= 模块。
+*** 注意
+如果要包目录的话，需要在目录下新建一个 =__init__.py= 文件，文件可以是空的，也可以有 =Python= 代码，因为 
+=__init__.py= 本身就是一个模块，模块名为 =mycompany=
+** 使用模块
+1. 导入模块 =import module=
+2. 运行模块内的函数
+3. 示例，以下为 =test= 模块内容，假设存为 =hello.py= 文件
+   #+BEGIN_SRC python
+     #!/usr/bin/env python
+     # -*- coding:utf-8 -*-
+
+     'a test module'
+     __author__='HuChen'
+
+     import sys
+
+     def test():
+         args = sys.argv
+         if(len(args)==1):
+             print("hello, world")
+         elif(len(args)==2):
+             print('hello, %s' %args[1])
+         else:
+             print("Too many arguments");
+
+     if __name__=='__main__':
+         test()
+   #+END_SRC
+   1) 代码前两行指定了使用的解释器和编码
+
+   2) 模块第一次出现的字符串 (本例中为 'a test module') 默认为模块的注释
+
+   3) 模块中 "__author__ ='Huchen'" 是也是模块注释，表明作者
+
+   4) 'import sys' 导入了 'sys' 模块，现在就有了 =sys= 变量指向了 =sys= 模块，可以使用 =sys= 模块中的所有内容
+
+   5) 'sys' 模块中有一个 'argv' 变量，用 =list= 存储了命令行所有内容
+
+   6) 最后的 'if' 语句作用: 如果在命令行运行模块文件时， =Python= 解释器会定义一个 =__name__= 变量，值为 =__main__=,
+      而如果实在 =Python= 交互环境中，导入 =test= 模块时， =if= 判断将失效。
+
+   7) 使用时，假设该 =test= 模块在 =mycompany= 目录下的 =web= 子目录中，各目录均有 =__init__.py= 文件，导入语句如下
+      #+BEGIN_EXAMPLE
+        >>> import mycompany.web.hello
+        >>> mycompany.web.hello.test()
+      #+END_EXAMPLE
+*** 注意 
+前缀是 '_' 或者 '__' 不应该直接引用
+** 安装第三方模块
+1. 利用 =pip= 直接下载安装，一般而言，所有第三方库都会在 [[https://pypi.python.org/][pypi.python.org]] 注册，可以在 =Python= 官网或 =pypi= 
+   网站搜索安装需要的第三方库
+2. 模块搜索路径
+   #+BEGIN_SRC python
+     import sys
+     print(sys.path)
+   #+END_SRC
+   上述代码可以查看 =Python= 默认搜索模块的路径，如果需要添加路径的话，有两种方法
+   1) 临时修改
+      #+BEGIN_SRC python
+        import sys
+        sys.path.append('path_name')
+      #+END_SRC
+   2) 永久添加，设置变量 =PYTHONPATH=, 添加自己需要添加的搜索路径
+* 面向对象编程
+** 类和实例
+*** 类的定义
+   #+BEGIN_SRC python
+     class Student(object):
+         pass
+   #+END_SRC
+   1. 关键字 =class= 用来定义类
+   2. 关键字 =class= 后面跟类的名称，类名通常是首字母大写的单词
+   3. 紧接着 =(Object)= 表明定义的类继承自哪个父类
+*** 实例化
+#+BEGIN_EXAMPLE
+  >>> bart=Student()
+  >>> bart
+  <__main__.Student object at 0x7fcf2514a2e8>
+  >>> Student
+  <class '__main__.Student'>
+#+END_EXAMPLE
+定义好类之后，就可以将类实例化，创建实例通过 类名+括号实现，可以看出，变量 =bart= 就是一个指向 =Student=
+的实例，后面的 =0x7fcf2514a2e8= 就是实例的内存地址。
+1. 绑定属性
+   可以自由地给实例绑定属性，譬如，给实例 =bart= 绑定名称属性
+   #+BEGIN_SRC python
+     bart.name = 'Bart Simpson'
+   #+END_SRC
+2. =__init__= 方法
+   由于类起到模板的作用，因为实例化的时候，我们可以通过 =__init__= 方法，将 =name= =score= 等我们认为
+   必要的属性绑定到类上
+   #+BEGIN_SRC python
+     class Student(object):
+         def __init__(self, name, score):
+             self.name = name
+             self.score = score
+   #+END_SRC
+   注意到 =__init__= 方法第一个参数永远是 =self=, 类似于 =Java= 中的 =this=, 指向实例本身。
+   有了 =__init__= 方法后，必须传入与 =__init__= 方法参数对应的参数
+   #+BEGIN_EXAMPLE
+     >>> bart=Student("Bart", 97)                
+     >>> bart.name
+     'Bart'
+     >>> bart.score
+     97
+   #+END_EXAMPLE
+3. 数据封装
+   类似于 =Java= 中的 =setter= 和 =getter= 方法， =Python= 也可以在类中定义相应的 =print= =get= 方法
+   #+BEGIN_SRC python
+     class Student(object):
+         def __init__(self, name, score):
+             self.name = name
+             self.score = score
+
+         def print_score(self):
+             print("%s: %s" %(self.name, self.score))
+   #+END_SRC
+*** 访问限制
+如果想要内部属性不被外部访问，可以在属性名称前加两个下划线 '_', =Python= 中，如果实例变量名以 '_' 开头，就
+变成一个私有变量，只有内部可以访问，外部不可以访问，如果需要对属性进行修改，可以提供类似 =Java= 的 =setter=
+和 =getter= 方法。其实 =Python= 隐藏机制就是把有变量名改成类似 '__Student__name' 这样的名称，因此，还是 
+可以通过 'bart.__Student__name' 对属性进行修改。
+** 继承和多态
+类似 =Java=, 特有 鸭子类型
+** 获取对象信息
+*** =type()= 方法 
+*** =isinstance()= 方法
+*** =dir()= 方法
+** 实例属性和类属性
+*** 实例属性
+可以通过实例变量或者 =self= 变量定义实例属性
+#+BEGIN_EXAMPLE
+  >>> class Person(object):
+  ...     pass
+  ... 
+  >>> hu = Person("Huchen")
+#+END_EXAMPLE
+#+BEGIN_SRC python
+  class Person(object):
+      def __init__(self, name):
+          self.name = name
+#+END_SRC
+*** 类属性
+可以直接在类中定义属性
+#+BEGIN_SRC python
+  class Person(object):
+      name = 'Person'
+#+END_SRC
+类的所有实例均可以访问类属性
+* 面向对象高级编程
+** 使用 =__slots__=
+*** 实例动态绑定方法
+#+BEGIN_EXAMPLE
+  >>> class Student(object):
+  ...     pass
+  ... 
+  >>> s = Student()
+  >>> def set_name(self, name):
+  ...     self.name = name
+  ... 
+  >>> from types import MethodType
+  >>> s.set_name = MethodType(set_name, s)
+  >>> s.set_name("Huchen")
+  >>> s.name
+  'Huchen'
+#+END_EXAMPLE
+**** 缺点
+仅对当前实例起作用，其他实例不能使用 =set_name()= 方法
+*** 给 =class= 绑定方法 (对所有实例绑定方法)
+#+BEGIN_EXAMPLE
+  >>> Student.set_name = MethodType(set_name, Student)
+  >>> s2 = Student()
+  >>> s2.set_name("Shao")
+  >>> s2.name
+  'Shao'
+#+END_EXAMPLE
+*** 使用 =__slots__= 限制实例属性
+#+BEGIN_SRC python
+  class Student(object):
+      __slots__=('name', 'age') #用 tuple 定义允许绑定的属性值
+#+END_SRC
+#+BEGIN_EXAMPLE
+  >>> s1 = Student()
+  >>> s1.name = "Hu"
+  >>> s1.age = 30
+  >>> s1.gender = male
+  Traceback (most recent call last):
+    File "<stdin>", line 1, in <module>
+  NameError: name 'male' is not defined
+#+END_EXAMPLE
+** 使用 =@property=
+*** 属性暴露与否的讨论
+1. 属性暴露，易于操作
+2. 属性暴露，可能出现安全隐患
+3. 实例
+   #+BEGIN_SRC python
+     class Student(object):
+         pass
+   #+END_SRC
+   以下操作很容易导致安全隐患
+   #+BEGIN_EXAMPLE
+     >>> s1 = Student()
+     >>> s1.score = 9999
+   #+END_EXAMPLE
+*** 避免安全隐患的操作
+1. 使用 =set_score()= 和 =get_score()= 方法将属性隐藏并检查参数
+   #+BEGIN_SRC python
+     class Student(object):
+         def get_score(self):
+             return self._score
+         def set_score(self, value):
+             if not isinstance(value, int):
+                 raise ValueError("score must be an integer")
+             if value < 0 or value > 100:
+                 raise ValueError("score must be between 0 ~ 100")
+             self.__score = score
+   #+END_SRC
+   此时，
+   #+BEGIN_EXAMPLE
+     >>> s1 = Student()
+     >>> s1.set_score(99)
+     >>> s1.get_score()
+     99
+     >>> s1.set_score(999)
+     Traceback (most recent call last):
+       File "<stdin>", line 1, in <module>
+       File "<stdin>", line 8, in set_score
+     ValueError: score must within 0 to 100
+   #+END_EXAMPLE
+2. 使用以上方法，当需要访问和修改属性时，需要使用 =set_score()= 和 =get_score()= 方法，增加了复杂性，此时，
+   可以使用 =@property= 方法
+   #+BEGIN_SRC python
+     class Student(object):
+         @property
+         def score(self):
+             return self.__score
+
+         @score.setter
+         def score(self, value):
+             if not isinstance(value, int):
+                 raise ValueError("wrong type")
+             if value < 0 or value > 100:
+                 raise ValueError("score must be within 0 ~ 100")
+             self.__score = value
+   #+END_SRC
+   #+BEGIN_EXAMPLE
+     >>> s1 = Student()
+     >>> s1.score = 99
+     >>> s1.score
+     99
+     >>> s1.score = 999
+     Traceback (most recent call last):
+       File "<stdin>", line 1, in <module>
+       File "<stdin>", line 10, in score
+     ValueError: score must be within 0 ~ 100
+   #+END_EXAMPLE
+   1) 使用时， =@property= 将 =getter= 方法 (=get_score()=) 变为了属性，
+   2) 此时， =@property= 还创建了另一个装饰器 =@score.setter=, 负责把一个 =setter= 方法 (=set_score()=) 变为属性赋值
+   3) 可以只定义 =getter= 方法而不定义 =setter= 方法
+      #+BEGIN_SRC python
+        class Student(object):
+            @property
+            def birth(self):
+                return self.__birth
+            @birth.setter
+            def birth(self, value):
+                self.__birth = value
+            @property
+            def age(self):
+                return 2016-self.__birth
+      #+END_SRC
+      上面代码中， =birth= 属性是可读写的，而 =age= 则是只读的
+** 多重继承
++ 四种动物，分别为 Dog Bat Parrot Ostrich, 按照不同的方式可以进行分类
++ 按照哺乳动物与鸟类可以划分为 Mammal(Dog Bat) Bird(Parrot Ostrich)
++ 按照功能划分，可以分为 Runnable(Bat Parrot) Flyable(Parrot Bat)
++ 利用多重继承方式，可以分别设计大类如下
+  #+BEGIN_SRC python
+    # 总类
+    class Animal(object):
+        pass
+
+    # 物种分类
+    class Mammal(Animal):
+        pass
+
+    class Bird(Animal):
+        pass
+
+    # 功能划分
+    class Runnable(Animal):
+        pass
+
+    class Flyable(Animal):
+        pass
+  #+END_SRC
++ 之后，小类可以设计如下
+  #+BEGIN_SRC python
+    class Dog(Mammal, Runnable):
+        pass
+
+    class Bat(Mammal, Flyable):
+        pass
+
+    class Parrot(Bird, Flyable):
+        pass
+
+    class Ostrich(Bird, Runnable):
+        pass
+  #+END_SRC
+*** =MixIn= 设计模式
+设计类的继承关系，通常为主线单一模式，如果需要混入其他功能，则一般通过多重继承实现，这种
+设计通常通知为 =MixIn=
+** 定制类
+*** =__len__= 方法
+#+BEGIN_SRC python
+  class Person(object):
+      def __len__(self):
+          return 10
+#+END_SRC
+#+BEGIN_EXAMPLE
+  >>> p1 = Person()
+  >>> len(p1)
+  10
+#+END_EXAMPLE
+*** =__str__= 方法
+1. 正常使用 =print()= 方法输出一个类，会有类似如下输出
+   #+BEGIN_EXAMPLE
+     >>> print(p1)
+     <__main__.Person object at 0x7fe537410d30>
+   #+END_EXAMPLE
+2. 如果需要改进输出，可以重写 =__str__= 方法
+   #+BEGIN_SRC python
+     class Person(object):
+         def __len__(self):
+             return 10
+         def __str__(self):
+             return 'Object is \'Person\''
+   #+END_SRC
+3. 此时，使用 =print()= 输出如下
+   #+BEGIN_EXAMPLE
+     >>> p1 = Person()
+     >>> print(p1)
+     Object is 'Person'
+   #+END_EXAMPLE
+*** =__repr__= 方法
+重写 =__str__()= 方法仅仅改变了 =print(）= 输出，如果直接看实例输出，还是不美观
+#+BEGIN_EXAMPLE
+  >>> p1
+  <__main__.Person object at 0x7fe537410da0>
+#+END_EXAMPLE
+最简单的方法，令 =__str__()= 方法等于 =__repr__= 方法
+#+BEGIN_SRC python
+  __repr__ = __str__
+#+END_SRC
+*** =__iter__= 方法
+如果要使用 'for...in...' 循环，则需要实现 =__iter__= 方法。该方法返回一个迭代对象，然后 =Python= 调用
+该迭代对象的 =__next__= 方法拿到循环的下一个值。
+**** 示例 (斐波那契数列)
+#+BEGIN_SRC python
+  class Fib(object):
+      def __init__(self):
+          self.a, self.b = 0, 1 # 初始化两个计数器 a, b
+      def __iter__(self):
+          return self # 实例本身就是迭代对象，因此返回自身
+      def __next__(self):
+          self.a, self.b = self.b, self.a+self.b
+          if self.a > 1000:
+              raise StopIteration()
+          return self.a
+#+END_SRC
+*** =__getitem__= 方法
+如果要实现类似 =list= 那样的取下标方法，则需要实现 =__getitem__= 方法
+**** 示例 (改写裴波那契数列)
+#+BEGIN_SRC python
+  class Fib(object):
+      def __getitem__(self, n):
+          self.a, self.b = 1,1
+          for x in range(n):
+              self.a, self.b = self.b, self.a + self.b
+          return self.a
+#+END_SRC
+#+BEGIN_EXAMPLE
+  >>> print(Fib()[4])
+  5
+  >>> print(Fib()[1])
+  1
+  >>> print(Fib()[0])
+  1
+#+END_EXAMPLE
+**** 切片处理
+上述示例中并没有考虑切片的处理，因此，如果考虑到切片的话，代码可以改写如下:
+#+BEGIN_SRC python
+  class Fib(object):
+      def __getitem__(self, n):
+          if isinstance(n, int):
+              a, b = 1, 1
+              for x in range(n):
+                  a, b = b, a+b
+              return a
+          if isinstance(n, slice):
+              start = n.start
+              stop = n.stop
+              if start is None:
+                  start = 0
+              a, b = 1, 1
+              L = []
+              for x in range(n):
+                  if x >= start:
+                      L.append(a)
+                  a, b = b, a+b
+              return L
+#+END_SRC
+但以上代码还没有考虑切片的 =step= 以及负数的处理等
+*** =__getattr__= 方法 
+当调用对象并不拥有的属性的时候，会报错，此时，除了给实例对象添加属性外，还可以通过 =__getattr__= 方法
+动态返回一个属性
+#+BEGIN_SRC python
+  class Student(object):
+      def __init__(self):
+          self.name = name
+      def __getattr__(self, attr):
+          if attr == 'score':
+              return 99
+#+END_SRC
+当调用不存在的属性时， =Python= 会调用 =__getattr__(self, 'score')= 来尝试获取属性，这样，我们就有
+机会返回 =score= 的值。如果 =__getattr__= 方法也得不得相应的属性值， =Python= 会返回 =None=
+*** =__call__= 方法
+可以实现在实例本身上调用方法
+#+BEGIN_SRC python
+  class Student(object):
+      def __init__(self, name):
+          self.name = name
+      def __call__(self):
+          print('My name is %s.' %self.name)
+#+END_SRC
+调用时
+#+BEGIN_EXAMPLE
+  >>> hu = Student('Hu')
+  >>> hu()
+  My name is Hu.
+#+END_EXAMPLE
+利用 =__call__= 方法还可以定义参数。对实例进行直接调用就好比对一个函数进行调用，完全可以把对象看做函数，
+把函数看做对象。利用 =callable()= 方法可以用来判断某个对象是否可以调用。
+* 错误、调试和测试 
+** 错误处理
+*** =try= 语句
+1. 示例:
+   #+BEGIN_SRC python
+     try:
+         print("try...")
+         r = 10/0
+         print("result:", r)
+     except ZeroDivisionError as e:
+         print('except:', e)
+     finally:
+         print('finally...')
+     print('END')
+   #+END_SRC
+2. 执行结果
+   #+BEGIN_EXAMPLE
+     try...
+     except: division by zero
+     finally...
+     END
+   #+END_EXAMPLE
+3. 说明：
+   + 上述代码执行到 'r=10/0' 将会出错
+   + 由执行结果可知，如果执行出错， =try= 语句块后续内容不会执行
+   + 出错后，解释器直接跳转至错误处理，即 =except= 语句
+   + =except= 语句执行完，如果有 =finally= 语句，则执行 =finally= 语句块内容
+   + 如果将语句 'r=10/0' 中 '0' 改为 '2'，执行结果如下
+     #+BEGIN_EXAMPLE
+       try...
+       result: 5.0
+       finally...
+       END
+     #+END_EXAMPLE
+*** 错误类型
+1. 可能有不同的错误类型，可以用不同的 =except= 语句捕捉
+   示例:
+   #+BEGIN_SRC python
+     try:
+         print('try...')
+         r = 10 / int('a')
+         print('result:', r)
+     except ValueError as e:
+         print('ValueError:', e)
+     except ZeroDivisionError as e:
+         print('ZeroDivisionError:', e)
+     finally:
+         print('finally...')
+     print('END')
+   #+END_SRC
+2. 如果没有错误，可以使用 =else= 语句处理，这时，如果没有错误，将会执行 =else= 语句块内容
+   #+BEGIN_SRC python
+     try:
+         print('try...')
+         r = 10 / int('2')
+         print('result:', r)
+     except ValueError as e:
+         print('ValueError:', e)
+     except ZeroDivisionError as e:
+         print('ZeroDivisionError:', e)
+     else:
+         print('no error!')
+     finally:
+         print('finally...')
+     print('END')
+   #+END_SRC
+3. 错误在 =Python= 中是 =class= ，不同错误类型会有[[https://docs.python.org/3/library/exceptions.html#exception-hierarchy][继承关系]]。
+*** 调用堆栈 
+1. 示例
+   #+BEGIN_SRC python
+     # err.py:
+     def foo(s):
+         return 10 / int(s)
+
+     def bar(s):
+         return foo(s) * 2
+
+     def main():
+         bar('0')
+
+     main()
+   #+END_SRC
+
+2. 执行结果
+   #+BEGIN_EXAMPLE
+     $ python3 err.py
+     Traceback (most recent call last):
+       File "err.py", line 11, in <module>
+         main()
+       File "err.py", line 9, in main
+         bar('0')
+       File "err.py", line 6, in bar
+         return foo(s) * 2
+       File "err.py", line 3, in foo
+         return 10 / int(s)
+     ZeroDivisionError: division by zero
+   #+END_EXAMPLE
+
+3. 说明
+   + 错误没有被捕捉，会不断向上抛，最后被 =Python= 解释器捕获，打印出错误信息，然后程序退出
+
+   + 根据错误信息，可以一步步回溯哪里出错
+     1) 第 2~3 行, 指出 'main()' 出错了，在代码文件 'err.py' 第 11 行
+        #+BEGIN_EXAMPLE
+          File "err.py", line 11, in <module>
+              main()
+        #+END_EXAMPLE
+
+     2) 第 3~4 行, 指出 'bar('0')' 出错了，在代码文件 'err.py' 第 9 行
+        #+BEGIN_EXAMPLE
+          File "err.py", line 9, in main
+                   bar('0')
+        #+END_EXAMPLE
+                  
+     3) 第 5~6 行, 指出 'foo(s)' 出错了，在代码文件 'err.py' 第 6 行
+        #+BEGIN_EXAMPLE
+          File "err.py", line 6, in bar
+                   return foo(s) * 2
+        #+END_EXAMPLE
+
+     4) 第 7~9 行，指出错误语句 'return 10/int(s)'，而且错误类型是 'ZeroDivisionError'
+*** 记录错误 
+如果需要记录错误同时不中断程序运行，可以通过 =logging= 模块实现
+1. 示例
+   #+BEGIN_SRC python
+     # err_logging.py
+
+     import logging
+
+     def foo(s):
+         return 10 / int(s)
+
+     def bar(s):
+         return foo(s) * 2
+
+     def main():
+         try:
+             bar('0')
+         except Exception as e:
+             logging.exception(e)
+
+     main()
+     print('END')
+   #+END_SRC
+*** 抛出错误
+除了使用内置错误类型，我们可以自己定义一个错误的 =class=, 然后用 =raise= 语句抛出一个错误的实例
+1. 示例
+   #+BEGIN_SRC python
+     # err_raise.py
+     class FooError(ValueError):
+         pass
+
+     def foo(s):
+         n = int(s)
+         if n==0:
+             raise FooError('invalid value: %s' % s)
+         return 10 / n
+
+     foo('0')
+   #+END_SRC
+
+2. 执行结果可以追踪到我们定义到的错误
+   #+BEGIN_EXAMPLE
+     $ python3 err_raise.py 
+     Traceback (most recent call last):
+       File "err_throw.py", line 11, in <module>
+         foo('0')
+       File "err_throw.py", line 8, in foo
+         raise FooError('invalid value: %s' % s)
+     __main__.FooError: invalid value: 0
+   #+END_EXAMPLE
+
+3. 错误的重复抛出
+   下面代码中，重复抛出了错误，原因在于，第一次捕捉错误是记录一下，便于后续追踪，但当前函数很可能处理
+   不了异常，因此又把错误通过 =raise= 抛出去。 =raise= 语句如果不带参数，就会把当前错误原样抛出。
+   #+BEGIN_SRC python
+     # err_reraise.py
+
+     def foo(s):
+         n = int(s)
+         if n==0:
+             raise ValueError('invalid value: %s' % s)
+         return 10 / n
+
+     def bar():
+         try:
+             foo('0')
+         except ValueError as e:
+             print('ValueError!')
+             raise
+   #+END_SRC
+
+4. 错误的转化
+   在 =except= 中， =raise= 一个错误，除了原样抛出，还可以将错误进行类似下面代码的转换
+   #+BEGIN_SRC python
+     try:
+         10 / 0
+     except ZeroDivisionError:
+         raise ValueError('input error!')
+   #+END_SRC
+*** 调试
+**** print 语句
+出现错误，最简单的方式就是用 =print()= 语句将可能有问题的变量等打印出来
+**** 断言
+凡是用 =print()= 辅助查看的地方，都可以用 =assert= 来替代
+#+BEGIN_SRC python
+  def foo(s):
+      n = int(s)
+      assert n != 0, 'n is zero'
+      return 10/n
+
+  def main():
+      foo('0')
+#+END_SRC
+=assert= 语句意思是 'n != 0' 肯定是 'True', 否则根据程序逻辑，后面代码肯定出错，
+如果断言失败， =assert= 会抛出 =AssertionError=
+***** 说明
+调试时，可以关闭 'assert', 只需要用 '-O' 参数即可
+#+BEGIN_SRC shell
+  python -O err.py
+#+END_SRC
+**** =logging=  
+将 =print()= 改为 =logging=, 和 =assert= 相比，该方式不会抛出错误，而且可以输出到
+文件
+1. 示例
+   #+BEGIN_SRC python
+     #err.py
+     import logging
+     logging.basicConfig(level=logging.INFO)
+   
+     s = '0'
+     n = int(s)
+     logging.info('n = %d' % n)
+     print(10 / n)
+   #+END_SRC
+2. 输出结果如下:
+   #+BEGIN_EXAMPLE
+     INFO:root:n is 0
+     Traceback (most recent call last):
+       File "err.py", line 9, in <module>
+         print(10/n)
+     ZeroDivisionError: division by zero
+   #+END_EXAMPLE
+3. 说明
+   =logging= 可以指定记录信息级别 =debug= =info= =warning= =error= 等几个级别，
+   当我们指定 =level=INFO=, 则 =logging.debug= 就不起作用了，同理，指定 =level=WARNING=,
+   =debug= 和 =info= 也不起作用了。
+**** =pdb=
+=Python= 解释器的 =pdb= 调试器，可以使程序单步执行，使用时，加上参数 '-m pdb' 即可
+1. =pdb= 下，几个常用命令
+   'l' 查看代码
+   'n' 执行下一步
+   'p 变量名' 查看变量名
+   'q' 结束调试
+2. =pdb.settrace()=
+   只需要 =import pdb=, 然后在程序中可能出错的地方，插入 =pdb.settrace()=, 就可以插入一个断点，
+   运行程序时，当执行到语句 =pdb.settrace()= 时，解释器进入 =pdb= 调试环境，此时可以单步执行查错。
+**** IDE
+类似 =eclipse= 和 =PyCharm= 等，可以比较方便地设置断点等
+** 单元测试
+*** 概念
+对一个模块、一个函数或者一个类进行正确性检验的测试工作
+*** 优点
+以测试为驱动的开发模式最大的好处就是确保一个程序模块的行为符合我们设计的测试用例。
+在将来修改时，可以极大程度保证该模块的正确性。
+*** 编写一个测试用例
+1. 要求：编写一个测试类 =Dict=, 这个类的行为与 =dict= 一致，但是可以通过属性来访问，用起来像下面所示
+   #+BEGIN_EXAMPLE
+     >>> d = Dict(a=1, b=2)
+     >>> d['a']
+     1
+     >>> d.a
+     1
+   #+END_EXAMPLE
+2. 利用定制类所提及的 =__getattr__= 来实现功能
+   #+BEGIN_SRC python
+     # mydict.py
+     class Dict(dict):
+         def __init__(self, **kw):
+             super().__init__(**kw)
+         def __getattr__(self, key):
+             try:
+                 return self[key]
+             except KeyError:
+                 raise AttributeError("'Dict' has no attribute %s" % key)
+         def __setattr__(self, key, value):
+             self[key] = value
+   #+END_SRC
+3. 编写单元测试
+   #+BEGIN_SRC python
+     # mydict_test.py
+     import unittest
+     from mydict import Dict
+
+     class TestDict(unittest.TestCase):
+         def test_init(self):
+             d = Dict(a=1, b='test')
+             self.assertEqual(d.a, 1)
+             self.assertEqual(d.b, 'test')
+             self.assertTrue(isinstance(d, dict))
+         def test_key(self):
+             d = Dict()
+             d['key'] = 'value'
+             self.assertEqual(d.key, 'value')
+         def test_attr():
+             d = Dict()
+             d.key = 'value'
+             self.assertTrue('key' in d)
+             self.assertEqual(d['key'], 'value')
+         def test_keyerror():
+             d = Dict()
+             with self.assertRaises(KeyError):
+                 value = d['empty']
+         def test_attrerror():
+             d = Dict()
+             with self.assertRaises(AttributeError):
+                 value = d.empty
+   #+END_SRC
+4. 测试
+   最简单的方法就是在上述代码末尾加上如下两行
+   #+BEGIN_SRC python
+     if __name__ = 'main':
+         unittest.main()
+   #+END_SRC
+   这样可以直接在命令行中运行以上程序，如果不加以上两行，则可以直接用以下命令:
+   #+BEGIN_SRC shell
+     python -m unittest mydict_test.py
+   #+END_SRC
+5. =setUp()= 和 =tearDown()=
+   在定义的单元测试代码中定义 =setUp()= 和 =tearDown()=, 则解释器在调用测试方法时分别在测试前
+   和测试后运行 =setUp()= 和 =tearDown()= 方法
+** 文档测试
+1. 示例
+   #+BEGIN_SRC python
+     # mydict2.py
+     class Dict(dict):
+         '''
+         Simple dict but also support access as x.y style.
+
+         >>> d1 = Dict()
+         >>> d1['x'] = 100
+         >>> d1.x
+         100
+         >>> d1.y = 200
+         >>> d1['y']
+         200
+         >>> d2 = Dict(a=1, b=2, c='3')
+         >>> d2.c
+         '3'
+         >>> d2['empty']
+         Traceback (most recent call last):
+             ...
+         KeyError: 'empty'
+         >>> d2.empty
+         Traceback (most recent call last):
+             ...
+         AttributeError: 'Dict' object has no attribute 'empty'
+         '''
+         def __init__(self, **kw):
+             super(Dict, self).__init__(**kw)
+
+         def __getattr__(self, key):
+             try:
+                 return self[key]
+             except KeyError:
+                 raise AttributeError(r"'Dict' object has no attribute '%s'" % key)
+
+         def __setattr__(self, key, value):
+             self[key] = value
+
+     if __name__=='__main__':
+         import doctest
+         doctest.testmod()
+   #+END_SRC
+
+2. 说明
+   + 类似示例中的注释可以被 =Python= 内置的 =doctest= 模块直接提取和执行
+
+   + =doctest= 严格按照 =Python= 交互命令行的输入和输出判断测试结果是否正确
+
+   + 如果测试异常，可以用 '...' 表示中间的大段恼人的输出
+
+   + 上述代码如果直接执行，什么都没有输出，表明结果是正确的
+
+   + 如果将上述代码中 =__getattr__= 删除，然后运行，就会报错
+     #+BEGIN_EXAMPLE
+       $ python3 mydict2.py
+       ,**********************************************************************
+       File "/Users/michael/Github/learn-python3/samples/debug/mydict2.py", line 10, in __main__.Dict
+       Failed example:
+           d1.x
+       Exception raised:
+           Traceback (most recent call last):
+             ...
+           AttributeError: 'Dict' object has no attribute 'x'
+       ,**********************************************************************
+       File "/Users/michael/Github/learn-python3/samples/debug/mydict2.py", line 16, in __main__.Dict
+       Failed example:
+           d2.c
+       Exception raised:
+           Traceback (most recent call last):
+             ...
+           AttributeError: 'Dict' object has no attribute 'c'
+       ,**********************************************************************
+       1 items had failures:
+          2 of   9 in __main__.Dict
+       ,***Test Failed*** 2 failures.
+     #+END_EXAMPLE
+* IO编程
+** 文件读写
+*** 说明
+现代操作系统不允许普通程序直接操作磁盘，因此，读写文件是请求操作系统打开一个文件
+对象 (通常称之为文件描述符)，然后通过操作系统提供的接口从这个文件对象中读取数据
+或者写入数据到这个文件对象中。
+*** 打开文件
+=Python= 通过 =open()= 函数打开文件，按照读或者写的要求，填入不同的标志符
+#+BEGIN_EXAMPLE
+  >>> f = open('/path/to/file','r') #读，文本文件
+  >>> f = open('/path/to/file','rb') #读，二进制文件
+  >>> f = open('/path/to/file','w') #写，文本文件
+  >>> f = open('/path/to/file','wb') #写，二进制文件
+#+END_EXAMPLE
+*** 读文件
+通过 =read()= 将文件内容一次读出，返回 =str= 对象。如果文件内容太大，可以用
+=read(size)= 函数，每次读出 'size' 大小的内容。此外，还可以使用 =readline()=
+函数，每次读出一行内容， =readlines()= 则将文件内容全部读出，但是返回 =list=
+*** 写文件
+写文件通过 =write()= 函数完成
+#+BEGIN_EXAMPLE
+  >>> f = open('/path/to/file', 'w')
+  >>> f.write("Hello World!")
+  >>> f.close()
+#+END_EXAMPLE
+*** 关闭文件
+文件打开后会占用操作系统资源，因此需要关闭，但是如果文件没有正确打开，或出现 =IOError=,
+为了保证无论是否正确打开文件，都能将文件关闭，可以用 =try...finally= 语句
+#+BEGIN_SRC python
+  try:
+      f = open("/path/to/file", "r")
+      print(f.read())
+  finally:
+      if f:
+          f.close()
+#+END_SRC
+上述方法太过繁琐，还可以用另一种写法
+#+BEGIN_EXAMPLE
+  with open("/path/to/file", "r") as f:
+       print(f.read())
+#+END_EXAMPLE
+*** 编码
+有时候打开的文本编码并不是 =UTF-8= 模式，可以给 =open()= 函数设置正确的编码
+#+BEGIN_SRC python
+  f = open('/path/to/file', 'r', encoding='gbk')
+#+END_SRC
+或者文件可能包含多种编码，打开时希望忽略编码错误，可以
+#+BEGIN_SRC python
+  f = open('/path/to/file', 'r', encoding='gbk', errors='ignore')
+#+END_SRC
+*** file-like Object
+定义了 =read()= 方法的对象，就是 =file-like object=. =StringIO= 就是在内存中
+创建的 =file-like object=, 常用作临时缓冲。
+** StringIO 和 BytesIO
+*** StringIO
+**** 说明
+在内存中读写 =str=
+**** 写入
+可以先创建一个 =str=, 然后像文件一样写入即可
+#+BEGIN_EXAMPLE
+  >>> from io import StringIO
+  >>> f = StringIO()
+  >>> f.write('hello')
+  5
+  >>> f.write(' ')
+  1
+  >>> f.write('world!')
+  6
+#+END_EXAMPLE
+**** 读取
+用 =getvalue()= 来获取写入后的 =str=
+#+BEGIN_EXAMPLE
+  >>> print(f.getvalue())
+  hello world!
+#+END_EXAMPLE
+还可以用 =str= 初始化 =StringIO=, 然后像文件一样读取
+#+BEGIN_EXAMPLE
+  >>> from io import StringIO
+  >>> f = StringIO('Hello!\nHi!\nGoodbye!')
+  >>> while True:
+  ...     s = f.readline()
+  ...     if s == '':
+  ...         break
+  ...     print(s.strip())
+  ...
+  Hello!
+  Hi!
+  Goodbye!
+#+END_EXAMPLE
+*** BytesIO
+**** 说明
+=StringIO= 操作的是 =str=, 而 =BytesIO= 操作的是二进制数据
+**** 写入
+#+BEGIN_EXAMPLE
+  >>> from io import BytesIO
+  >>> f = BytesIO()
+  >>> f.write("中文".encode('utf-8'))
+  6
+  >>> print(f.getvalue())
+  b'\xe4\xb8\xad\xe6\x96\x87'
+#+END_EXAMPLE
+**** 读出
+#+BEGIN_EXAMPLE
+  >>> from io import StringIO
+  >>> f = BytesIO(b'\xe4\xb8\xad\xe6\x96\x87')
+  >>> f.read()
+  b'\xe4\xb8\xad\xe6\x96\x87'
+#+END_EXAMPLE
+

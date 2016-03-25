@@ -1,0 +1,13 @@
+#+TITLE： 非工作事务记录
+#+AUTHOR: 胡琛
+
+* Miscellaneous(杂项）
+
+** Organization(时间组织)
+:PROPERTIES:
+:ID:       d0f19ba5-3acf-4551-9a2c-d6c4881d8459
+:END:
+:LOGBOOK:
+CLOCK: [2016-03-25 五 13:31]--[2016-03-25 五 13:32] =>  0:01
+CLOCK: [2016-03-25 五 09:40]--[2016-03-25 五 09:41] =>  0:01
+:END:
