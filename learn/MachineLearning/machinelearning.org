@@ -232,24 +232,32 @@
 **** =ID3= 算法(仅对于属性离散且不要求生成二叉树的情况讨论)
 如果待分类的事物可能划分在多个分类中，譬如，设D为用类别对训练元组进行的划分
 1. 符号 $x_i$ 信息的定义：
-   \begin{equation}
-   l(x_i) = -\log_{2}p(x_i)
-   \end{equation}
+   #+BEGIN_SRC latex
+     \begin{equation}
+       l(x_i) = -\log_{2}p(x_i)
+     \end{equation}
+   #+END_SRC
    其中$p_(x_i)$表示第i个类别在整个训练元组出现的概率
 2. D的熵(entropy)定义
-   \begin{equation}
-   info(D) = -\sum^n_{i=1}p(x_i)\log_{2}p(x_i)
-   \end{equation}
+   #+BEGIN_SRC latex
+     \begin{equation}
+       info(D) = -\sum^n_{i=1}p(x_i)\log_{2}p(x_i)
+     \end{equation}
+   #+END_SRC
    熵的实际意义表示D中元组的类标号所需要的平均信息量。
 3. 假设训练元组D按属性A划分，则该划分的熵计算如下：
-   \begin{equation}
-   info_A(D)=\sum^{\nu}_{j=1}\frac{D_i}{D}info(D_j)
-   \end{equation}
-4. 将D按属性A划分后，信息增益为两者的差值
-   \begin{equation}
-   gain(A) = info(D) - info_A(D)
-   \end{equation}
-5. 将D按所有属性进行划分，计算各种划分的信息增益，选择增益最大的属性进行划分，之后递归至
+   #+BEGIN_SRC latex
+     \begin{equation}
+       info_A(D)=\sum^{\nu}_{j=1}\frac{D_i}{D}info(D_j)
+     \end{equation}
+   #+END_SRC
+5. 将D按属性A划分后，信息增益为两者的差值
+   #+BEGIN_SRC latex
+     \begin{equation}
+       gain(A) = info(D) - info_A(D)
+     \end{equation}
+   #+END_SRC
+6. 将D按所有属性进行划分，计算各种划分的信息增益，选择增益最大的属性进行划分，之后递归至
    + 划分后的所有分支内的元素都属于同一类别
    + 可用于划分的属性已使用完
 ** 示例
