@@ -216,7 +216,7 @@
 2. 注意 'labels' 从字符串中导入时，将字符串强转为 =int= 型
 * 决策树
 ** 概述
-**** COMMENT 定义
+**** 定义
 决策树的分类思想类似姑娘找对象，相亲前，通过类似年龄、长相、收入，职业等将男人分为见或不见两类。类似下图：
 [[file:figs/decision_tree.png]]
 从上图，可以总结出决策树的定义，即： 决策树（decision tree）是一个树结构（可以是二叉树或非二叉树）。其
@@ -380,10 +380,9 @@
             featValues = [example[bestFeat] for example in dataSet]
             uniqueValues = set(featValues)
 
-
             # 按特征属性值进行分割
             for value in uniqueValues:
-                subLabels = labels[:]
+                subLabels = labels[:] # 尤其注意这句话的含义？
                 myTree[bestFeatLabel][value] = createTree(splitDataSet(dataSet, bestFeat, value), subLabels)
 
             # 返回树
