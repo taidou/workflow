@@ -266,7 +266,7 @@ k-近邻算法(kNN)
 #### 定义
 
 决策树的分类思想类似姑娘找对象，相亲前，通过类似年龄、长相、收入，职业等将男人分为见或不见两类。类似下图：
-![决策树](figs/decision_tree.png) 从上图，可以总结出决策树的定义，即：
+![](figs/decision_tree.png) 从上图，可以总结出决策树的定义，即：
 决策树（decision tree）是一个树结构（可以是二叉树或非二叉树）。其
 每个非叶节点表示一个特征属性上的测试，每个分支代表这个特征属性在某个值域上的输出，而每个叶节点存放一个类别。
 使用决策树进行决策的过程就是从根节点开始，测试待分类项中相应的特征属性，并按照其值选择输出分支，直到到达叶
@@ -481,4 +481,186 @@ k-近邻算法(kNN)
               return myTree
         ```
 
+使用 `matplotlib` 画树图
+------------------------
 
+### 关于注释
+
+#### 注释文字 (`Annotation Text`)
+
+`text()` 函数可以设置在哪个位置坐标系任意位置添加文本。 而 `annotate()`
+函数可以在添加文本 的基础上，提供更多丰富的功能，使得添加注释更加容易。
+在注释中，最重要的是两个参数，一个是参数
+'xy'，它代表需要被注释的点所在位置；另一个参数是
+'xytext'，代表注释文本所在位置。
+
+``` {.python}
+  import numpy as np
+  import matplotlib.pyplot as plt
+
+  fig = plt.figure()
+  ax = fig.add_subplot(111)
+
+  t = np.arange(0.0, 5.0, 0.01)
+  s = np.cos(2*np.pi*t)
+  line, = ax.plot(t, s, lw=2)
+
+  ax.annotate('local max', xy=(2, 1), xytext=(3, 1.5),
+              arrowprops=dict(facecolor='black', shrink=0.05),
+              )
+
+  ax.set_ylim(-2,2)
+  plt.show()
+```
+
+上述代码会产生如下图所示效果： ![](figs/annotation_01.png)
+
+#### 坐标系 (`coordinate system`)
+
+在上述代码中， `annotate()` 函数没有指定坐标系，默认 'xy' 'xytext'
+所代表的位置为数据坐标系，
+实际应用中，我们可以按需求任意指定坐标系，可用的坐标系可见下表：
+
+  argument            coordinate system
+  ------------------- ----------------------------------------------------
+  'figure points'     points from the lower left corner of the figure
+  'figure pixels'     pixels from the lower left corner of the figure
+  'figure fraction'   0,0 is lower left of figure and 1,1 is upper right
+  'axes points'       points from lower left corner of axes
+  'axes pixels'       pixels from lower left corner of axes
+  'axes fraction'     0,0 is lower left of axes and 1,1 is upper right
+  'data'              use the axes data coordinate system
+
+譬如， 注释位置用 'fractional axes’ coordinates，可以
+
+``` {.python}
+  ax.annotate('local max', xy=(3,1), xycoords='data', xytext=(0.8, 0.95),\
+              textcoords='axes fraction', arrowprops=dict(facecolor='black', shrink=0.05),\
+              horizontalalignment='right',verticalalignment='top')
+```
+
+#### 箭头性质 (`arrow properties`)
+
+箭头性质也可以用下表的参数进行指定
+
+  arrowprops key   description
+  ---------------- ---------------------------------------------------------------------------
+  width            the width of the arrow in points
+  frac             the fraction of the arrow length occupied by the head
+  headwidth        the width of the base of the arrow head in points
+  shrink           move the tip and base some percent away from the annotated point and text
+  \*\*kwargs       any key for matplotlib.patches.Polygon, e.g., facecolor
+
+#### 线条性质
+
+最简单方式，利用以下代码查看可用线条性质设置
+
+``` {.python}
+  lines = plt.plot([1,2,3])
+  plt.setp(lines)
+```
+
+#### 注释轴 (`Annotation Axes`)
+
+##### Annotating with Text with Box
+
+`text()` 会接受 'bbox' 关键词参数，当接受到 'bbox'
+参数时，注释文字会被一个 'box' 包围
+
+``` {.python}
+  bbox_props = dict(boxstyle='rarrow, pad=0.3', fc='cyan', ec='b', lw=2)
+  t = ax.text(0, 0, "Direction", ha='center', va='center', rotation=45, size =15,\
+              bbox=bbox_props,)
+```
+
+下表是 'box' 可接受的参数与属性值
+
+  Class        Name         Attrs
+  ------------ ------------ -----------------------------
+  Circle       circle       pad=0.3
+  DArrow       darrow       pad=0.3
+  LArrow       larrow       pad=0.3
+  RArrow       rarrow       pad=0.3
+  Round        round        pad=0.3
+  Round4       round4       pad=0.3,rounding~size~=None
+  Roundtooth   roundtooth   pad=0.3,tooth~size~=None
+  Sawtooth     sawtooth     pad=0.3,tooth~size~=None
+  Square       square       pad=0.3
+
+与上表对应的图如下： ![](figs/annotation_02.png)
+
+##### Anonotating with Arrow
+
+`annotate()` 函数在 `pyplot` 中是用来连接两个点的 (注释点与被注释点)。
+画 'arrow' 主要分为以下几步：
+
+1.  确定两点之间的连接路径，可以通过 `connectionsytle` 来控制
+2.  假如 'patch object' (画块) 给定 (patchA &
+    patchB)，路径会被裁剪，避开画块
+3.  路径按照给定的 'pixels' 数值进行 'shrunk'
+4.  路径变形为箭头状，通过 `arrowstyle` 控制属性
+
+以上步骤总结在下图中： ![](figs/annotation_03.png) 注意：
+
+1.  `connectionstyle` 可用的选项如下表：
+
+      name     Attrs
+      -------- ---------------------------------------------------
+      angle    angleA=90, angleB=0, rad=0.0
+      angle3   angleA=90, angleB=0
+      arc      angleA=0, angleB=0, armA=None, armB=None, rad=0.0
+      arc3     rad=0.0
+      bar      armA=0.0,armB=0.0,fraction=0.3,angle=None
+
+    其中 'angle3' 和 'arc3' 中的 3
+    表示其指定的路径样式为二次样条线段，有 3
+    个控制点，上述格式对应下图： ![](figs/annotation_04.png)
+2.  `arrowstyle` 可用选项如下：
+
+      Name          Attrs
+      ------------- ----------------------------------------------------
+      -             None
+      -&gt;         head~length~=0.4,head~width~=0.2
+      -\[           widthB=1.0, lengthB=0.2, angleB=None
+      |-|           widthA=1.0, widthB=1.0
+      -|&gt;        head~length~=0.4, head~width~=0.2
+      &lt;-         head~length~=0.4, head~width~=0.2
+      &lt;-&gt;     head~length~=0.4, head~width~=0.2
+      &lt;|-        head~length~=0.4, head~width~=0.2
+      &lt;|-|&gt;   head~length~=0.4, head~width~=0.2
+      fancy         head~length~=0.4, head~width~=0.4, tail~width~=0.4
+      simple        head~length~=0.5, head~width~=0.5, tail~width~=0.2
+      wedge         tail~width~=0.3, shrink~factor~=0.5
+
+    具体样式见下图： ![](figs/annotation_05.png) 有些 `arrowstyle`
+    仅与能生成二次样条线段的 `connectionstyle` 配合，这些 `arrowstyle`
+    是 'fancy', 'simple', 'wedge'
+
+### 树节点构造
+
+终止块(叶节点)使用 `boxstyle=round4` 决策节点用 `boxstyle=sawtooth`
+
+``` {.python}
+  import matplotlib.pyplot as plt
+
+  # 决策节点样式
+  decisionNode = dict(boxstyle='sawtooth', fc='0.8')
+
+  # 叶节点
+  leafNode = dict(boxstyle='round4', fc=0.8)
+
+  # arrow样式
+  arrow_args = dict(arrowstyle='<-')
+
+  def plotNode(nodeTxt, centerPt, parentPt, nodeType):
+      createPlot.ax1.annotate(nodeTxt, xy=parentPt, xycoords='axes fraction',\
+                              xytext=centerPt, textcoords='axes fraction',\
+                              va='center', ha='center', bbox=nodeType, arrowprops=arrow_args)
+
+  def createPlot():
+      fig = plt.figure(1, facecolor='white')
+      fig.clf()
+      createPlot.ax1 = plt.subplot(111, frameon=False)
+      plotNode(U'决策节点', (0.5， 0.1), (0.1, 0.5), decisionNode)
+      plotNode(U'叶节点', (0.8， 0.1), (0.3, 0.5), leafNode)
+```
