@@ -34,7 +34,7 @@
   3. 算法提取样本集中数据中最相似(最相邻)的分类标签，一般而言，我们只选择样本数据前k个最相似数据
   4. k即为k-近邻算法中k的出处，一般k取值不大于20
 ** 示例
-*** 场景一
+*** 场景一 k-近邻算法改进约会网站配对效果
 收集到约会数据，保存在 'datingTestSet.txt' 中，每个样本数据占据一行，总共有1000行。
 样本包含以下3种特征以及1种label：
 + 每年获得的飞行常客里程数
@@ -125,7 +125,7 @@
              if(classifierResult != datingLabels[i]): errorCount += 1.0
          print("the total error rate is: %f" %(errorCount/float(numTestVecs)))
    #+END_SRC
-*** 场景二
+*** 场景二 k-近邻算法实现手写识别系统
 目录digits下，分别有两个目录，testDigits和trainingDigits，代表用于测试的数据和训练的数据，
 样本名包含需要识别的数字，也就是label，样本中是需要识别的手写数字数据集，每个单独文件都是32x32
 的矩阵形式，包含 0 和 1
@@ -216,20 +216,20 @@
 2. 注意 'labels' 从字符串中导入时，将字符串强转为 =int= 型
 * 决策树
 ** 概述
-**** 定义
+*** 定义
 决策树的分类思想类似姑娘找对象，相亲前，通过类似年龄、长相、收入，职业等将男人分为见或不见两类。类似下图：
 [[file:figs/decision_tree.png]]
 从上图，可以总结出决策树的定义，即： 决策树（decision tree）是一个树结构（可以是二叉树或非二叉树）。其
 每个非叶节点表示一个特征属性上的测试，每个分支代表这个特征属性在某个值域上的输出，而每个叶节点存放一个类别。
 使用决策树进行决策的过程就是从根节点开始，测试待分类项中相应的特征属性，并按照其值选择输出分支，直到到达叶
 子节点，将叶子节点存放的类别作为决策结果。
-**** 构造
+*** 构造
 关键步骤在于分裂属性，即在某个节点处按照某一特征属性的不同划分构造不同的分支，目标是让各个分裂子集尽可能地
 “纯”，即可能纯就是尽量让一个分裂子集中待分类项属于同一类别。分裂属性分三种情况：
 1. 属性离散且不要求生成二叉树，此时用属性的每一个划分作为一个分支
 2. 属性离散且要求生成二叉树，此时使用属性划分的一个子集作为测试，以“属于子集”和“不属于子集”分成两个分支
 3. 属性值连续，确定一个值作为分裂点(split-point)，以 <split-point 和 >split-point 生成两个分支
-**** =ID3= 算法(仅对于属性离散且不要求生成二叉树的情况讨论)
+*** =ID3= 算法(仅对于属性离散且不要求生成二叉树的情况讨论)
 如果待分类的事物可能划分在多个分类中，譬如，设D为用类别对训练元组进行的划分
 1. 符号 $x_i$ 信息的定义：
    #+BEGIN_SRC latex
@@ -261,7 +261,7 @@
    + 划分后的所有分支内的元素都属于同一类别
    + 可用于划分的属性已使用完
 ** 示例
-*** 场景
+*** 场景 决策树预测隐形眼镜类型
 有数据文件 'lenses.txt'，其中包含了如何预测患者需要佩戴的隐形眼镜类型数据。分为5列，
 前四列为特征属性，最后一列为隐形眼镜的类型，也就是我们的 labels
 特征依次为 '年龄(age)' '处方(prescript)' '是否散光(astigmatic)' '眼泪多少(tearRate)' 
@@ -614,3 +614,122 @@
       plotTree(inTree, (0.5, 1.0), '')
       plt.show()
 #+END_SRC
+* 基于概率论的分类方法：朴素贝叶斯
+** 概述
+*** 概念
+事物有许多属性，譬如一个事物 $X$，可以定义其一系列属性
+#+BEGIN_SRC latex
+  \begin{equation}
+   $X = (x_1, x_2, x_3, \ldots)$
+  \end{equation}
+#+END_SRC
+作为其描述，而不同事物可能归属不同种类，可以用集合 $Y$ 作为各种不同种类的描述，
+#+BEGIN_SRC latex
+  \begin{equation}
+  Y = y_1, y_2, \ldots, y_m
+  \end{equation}
+#+END_SRC
+当给出任意一个事物 $X^{\prime}$ 的时候，我们需要预测这个事物到底属于哪个种类 $y^{\prime}$。
+朴素贝叶斯理论做了一个假设，认为任意一个实例不同属性之间相互独立，这样，可以计算一个实例，其处于
+不同种类之间的概率，选择概率最大的一个种类作为该实例种类的预测。如果定义 $P(y_i|X)$ 作为 $y_i$ 的
+后验概率，表示实例 $X$ 属于种类 $y_i$ 的概率， $P(y_i)$ 称为 $y_i$ 的先验概率，
+通过计算不同 $y_i$ 的后验概率，其中数值最大对应 $y_i$ 可以作为 $X$ 种类的预测。
+
+实际我们可以直接得到的，一般是 $X$ 的后验概率 $P(X|y_i)$ (相当于 $X$ 的属性出现在 $y_i$ 类的概率总和)
+和 $P(y_i)$ 的先验概率，但是，通过贝叶斯公式，我们可以求得 $X$ 的先验概率：
+#+BEGIN_SRC latex
+  \begin{equation}
+  P(y_i|X) = \frac{P(X|y_i)P(y_i)}{P(X)}
+  \end{equation}
+#+END_SRC
+*** 特点
++ 优点：数据较少的情况下仍然有效，可以处理多类别问题
++ 缺点：对于输入数据的准备方式较为敏感
++ 适用数据类型：标称型数据
+*** 举例说明
+**** 说明 
+考虑一个医疗诊断问题，有两种可能假设： 1). 病人有癌症 2). 病人没癌症。样本数据来自某化验测试，测试结果有两种
+1). 阳性 2). 阴性。 假如我们已经知道了普通人中只有 0.008 的人会患病。此外，化验结果对有病的患者有 98% 的可
+能返回阳性结果，对无病患者有 97% 概率返回阴性结果。此时，有一个病人化验测试结果时阳性，是否可以将病人诊断为得了
+癌症。
+**** 考虑
+#+BEGIN_SRC latex
+  \begin{alignat}{2}
+   \P(canser) &= 0.008  &\quad P(no canser) &= 0.992 \\  
+   \P(positive|canser) &= 0.98  &\quad P(negative|canser) &= 0.02 \\  
+   \P(positive|no canser) &= 0.03  &\quad P(negative|no canser) &= 0.97  
+  \end{alignat}
+#+END_SRC
+这样，通过贝叶斯公式，我们可以求得该病人测试结果为阳性时，其得癌与不得癌的概率：
+#+BEGIN_SRC latex
+  \begin{eqnarray}
+    P(canser|positive) &=& \frac{P(positive|canser)P(canser)}{P(positive)}\\\nolinenumber
+    {} & = & \frac{0.98\times{}0.008}{P(positive)}\\\nolinenumber
+    {} & = & \frac{0.0078}{P(positive)}\\
+    P(no canser|positive) & = & \frac{P(positive|no canser)P(no canser)}{P(positive)}\\\nolinenumber
+    {} & = & \frac{0.03\times{}0.992}{P(positive)}\\\nolinenumber
+    {} & = & \frac{0.0298}{P(positive)}
+  \end{eqnarray}
+#+END_SRC
+可以看出，该患者不得癌的概率更大，按照朴素贝叶斯的方法，我们认为其没有癌症。除此之外，我们还可以看出，我们不需要关系贝叶斯
+公式的分母部分，只需要考察分子部分大小即可。
+** 示例
+*** 场景一 利用朴素贝叶斯方法过滤垃圾邮件
+数据集包含50封邮件，其中25封为垃圾邮件，随机将数据集切分为训练集(40封)和测试集(10封)。邮件目录为
+'email'，下面又分为两个目录，分别为 'ham' 和 'spam'，存放普通邮件与垃圾邮件。
+**** 考虑
+1. 实例与类别的考虑：实例是邮件，类别是 'spam' 和 'ham'
+2. 实例的描述：创建词汇表，对应实例的属性
+   + 创建数据集('vocabList') =set=
+   + 将所有文档词汇分割后，进行 '并' 集操作
+3. 实例化为属性的描述：对于训练集
+   + 将不同文档根据 '属性表' 转换成一个个属性值的 'vector'
+4. 概率信息：
+   + 共有两个类别 'spam' 和 类别 'ham' 那么 
+     'spam' 的先验概率 $P('spam')$ 为：
+     训练集中标记为 'spam' 的邮件数/训练集所有邮件数
+     ’ham' 的先验概率 $P('ham')$ 为 $1-P('spam')$
+   + 'spam' 和 'ham' 类别中，不同属性的数目可以统计出来，除以该类别中所有邮件数，可以得到
+     不同属性的后验概率 $P(x_i|y_i)$
+   + 训练样本用属性值 $x_0, x_1, \ldots, x_m$ 表示，这样，训练样本 $X$ 的后验概率可以
+     表示为 $\prod_{i=0}^{n=m}P(x_i|y_i)$
+   + 为了避免出现某个属性概率值 $P(x_i|y_i)$ 为 0 导致整个实例的后验概率为 0 情况的出现，
+     使用 =log()= 形式来表示概率大小
+5. 测试样本 $X$ 用 'vocabList' 表示成 'vector'，然后利用已经训练得到的不同属性值的后验
+   概率，可以求得训练样本的后验概率，利用贝叶斯公式得到不同种类对应的后验概率，选择值最大的作为
+   测试样本的种类判断
+**** 实现
+1. 创建词汇表
+   #+BEGIN_SRC python
+     from numpy import *
+     from os import listdir
+     from os import path
+     import re
+
+     def createVocab():
+         spamDir = "./email/spam"
+         hamDir = "./email/ham"
+         spamMailList = []
+         hamMailList = []
+         spamMailList = [path.join(spamDir, spamEmail) for spamEmail in listdir(spamDir)]
+         hamMailList = [path.join(hamDir, hamEmail) for hamEmail in listdir(hamDir)]
+         mailList = spamMailList + hamMailList
+
+         # 创建词汇表
+         vocabSet = set([])
+         # 文本中标点符号和空白都不要
+         regEx = re.compile('\W*')
+         for mail in mailList:
+             wordSet = set(regEx.split(open(mail).read()))
+             vocabSet = vocabSet | wordSet
+
+         # 返回词汇表，垃圾邮件与正常邮件
+         return vocabSet, spamMailList, hamMailList
+   #+END_SRC
+2. 将训练集中的文档统一用 'vocabSet' 处理为 'vector'
+   #+BEGIN_SRC python
+     def bagOfWord2Vec():
+         for word in vocabSet:
+             for files in docList:
+                 pass
+   #+END_SRC
