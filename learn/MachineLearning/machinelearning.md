@@ -44,7 +44,7 @@ k-近邻算法(kNN)
 示例
 ----
 
-### 场景一
+### 场景一 k-近邻算法改进约会网站配对效果
 
 收集到约会数据，保存在 'datingTestSet.txt'
 中，每个样本数据占据一行，总共有1000行。
@@ -150,7 +150,7 @@ k-近邻算法(kNN)
           print("the total error rate is: %f" %(errorCount/float(numTestVecs)))
     ```
 
-### 场景二
+### 场景二 k-近邻算法实现手写识别系统
 
 目录digits下，分别有两个目录，testDigits和trainingDigits，代表用于测试的数据和训练的数据，
 样本名包含需要识别的数字，也就是label，样本中是需要识别的手写数字数据集，每个单独文件都是32x32
@@ -263,16 +263,16 @@ k-近邻算法(kNN)
 概述
 ----
 
-#### 定义
+### 定义
 
 决策树的分类思想类似姑娘找对象，相亲前，通过类似年龄、长相、收入，职业等将男人分为见或不见两类。类似下图：
-![](figs/decision_tree.png) 从上图，可以总结出决策树的定义，即：
+![](file:figs/decision_tree.png) 从上图，可以总结出决策树的定义，即：
 决策树（decision tree）是一个树结构（可以是二叉树或非二叉树）。其
 每个非叶节点表示一个特征属性上的测试，每个分支代表这个特征属性在某个值域上的输出，而每个叶节点存放一个类别。
 使用决策树进行决策的过程就是从根节点开始，测试待分类项中相应的特征属性，并按照其值选择输出分支，直到到达叶
 子节点，将叶子节点存放的类别作为决策结果。
 
-#### 构造
+### 构造
 
 关键步骤在于分裂属性，即在某个节点处按照某一特征属性的不同划分构造不同的分支，目标是让各个分裂子集尽可能地
 “纯”，即可能纯就是尽量让一个分裂子集中待分类项属于同一类别。分裂属性分三种情况：
@@ -282,7 +282,7 @@ k-近邻算法(kNN)
 3.  属性值连续，确定一个值作为分裂点(split-point)，以 &lt;split-point
     和 &gt;split-point 生成两个分支
 
-#### `ID3` 算法(仅对于属性离散且不要求生成二叉树的情况讨论)
+### `ID3` 算法(仅对于属性离散且不要求生成二叉树的情况讨论)
 
 如果待分类的事物可能划分在多个分类中，譬如，设D为用类别对训练元组进行的划分
 
@@ -327,7 +327,7 @@ k-近邻算法(kNN)
 示例
 ----
 
-### 场景
+### 场景 决策树预测隐形眼镜类型
 
 有数据文件
 'lenses.txt'，其中包含了如何预测患者需要佩戴的隐形眼镜类型数据。分为5列，
@@ -481,8 +481,8 @@ k-近邻算法(kNN)
               return myTree
         ```
 
-使用 `matplotlib` 画树图
-------------------------
+使用 `matplotlib` 画树图 :难，需回顾<span class="tag" data-tag-name="WORK"></span>
+----------------------------------------------------------------------------------
 
 ### 关于注释
 
@@ -513,7 +513,7 @@ k-近邻算法(kNN)
   plt.show()
 ```
 
-上述代码会产生如下图所示效果： ![](figs/annotation_01.png)
+上述代码会产生如下图所示效果： ![](file:figs/annotation_01.png)
 
 #### 坐标系 (`coordinate system`)
 
@@ -587,7 +587,7 @@ k-近邻算法(kNN)
   Sawtooth     sawtooth     pad=0.3,tooth~size~=None
   Square       square       pad=0.3
 
-与上表对应的图如下： ![](figs/annotation_02.png)
+与上表对应的图如下： ![](file:figs/annotation_02.png)
 
 ##### Anonotating with Arrow
 
@@ -600,7 +600,7 @@ k-近邻算法(kNN)
 3.  路径按照给定的 'pixels' 数值进行 'shrunk'
 4.  路径变形为箭头状，通过 `arrowstyle` 控制属性
 
-以上步骤总结在下图中： ![](figs/annotation_03.png) 注意：
+以上步骤总结在下图中： ![](file:figs/annotation_03.png) 注意：
 
 1.  `connectionstyle` 可用的选项如下表：
 
@@ -614,7 +614,7 @@ k-近邻算法(kNN)
 
     其中 'angle3' 和 'arc3' 中的 3
     表示其指定的路径样式为二次样条线段，有 3
-    个控制点，上述格式对应下图： ![](figs/annotation_04.png)
+    个控制点，上述格式对应下图： ![](file:figs/annotation_04.png)
 2.  `arrowstyle` 可用选项如下：
 
       Name          Attrs
@@ -632,7 +632,7 @@ k-近邻算法(kNN)
       simple        head~length~=0.5, head~width~=0.5, tail~width~=0.2
       wedge         tail~width~=0.3, shrink~factor~=0.5
 
-    具体样式见下图： ![](figs/annotation_05.png) 有些 `arrowstyle`
+    具体样式见下图： ![](file:figs/annotation_05.png) 有些 `arrowstyle`
     仅与能生成二次样条线段的 `connectionstyle` 配合，这些 `arrowstyle`
     是 'fancy', 'simple', 'wedge'
 
@@ -647,7 +647,7 @@ k-近邻算法(kNN)
   decisionNode = dict(boxstyle='sawtooth', fc='0.8')
 
   # 叶节点
-  leafNode = dict(boxstyle='round4', fc=0.8)
+  leafNode = dict(boxstyle='round4', fc="0.8")
 
   # arrow样式
   arrow_args = dict(arrowstyle='<-')
@@ -661,8 +661,86 @@ k-近邻算法(kNN)
       fig = plt.figure(1, facecolor='white')
       fig.clf()
       createPlot.ax1 = plt.subplot(111, frameon=False)
-      plotNode(U'决策节点', (0.5， 0.1), (0.1, 0.5), decisionNode)
-      plotNode(U'叶节点', (0.8， 0.1), (0.3, 0.5), leafNode)
+      plotNode(U'决策节点', (0.5, 0.1), (0.1, 0.5), decisionNode)
+      plotNode(U'叶节点', (0.8, 0.1), (0.3, 0.5), leafNode)
+      plt.show()
+```
+
+### 树大小确定
+
+1.  宽度：与叶节点数目有关
+
+    ``` {.python}
+      def getNumLeaf(myTree):
+          numLeafs = 0
+
+          # 使用递归方式获取叶节点
+          firstStr = myTree.keys()[0]
+          secondDict = myTree[firstStr]
+          for key in secondDict.keys():
+              # 创建myTree的时候，终止条件下，返回的是 dataSet 或 label
+              # 这里递归取 dict[key]，终止条件是取到 label
+              if type(secondDict[key]).__name__ == 'dict':
+                  numLeafs += getNumLeaf(secondDict[key])
+              else: numLeafs += 1
+          return numLeafs
+    ```
+
+2.  高度：与决策节点数目有关
+
+    ``` {.python}
+      def getTreeDepth(myTree):
+          maxDepth = 0
+          firstStr = myTree.keys()[0]
+          secondDict = myTree[firstStr]
+          for key in secondDict.keys():
+              if type(secondDict[key]).__name__ == 'dict':
+                  thisDepth = 1 + getTreeDepth(secondDict[key])
+              else: thisDepth = 1
+          return maxDepth
+    ```
+
+### 绘制树
+
+``` {.python}
+  # 父子节点直接插入文本
+  def plotMidText(cntrPt, parentPt, txtString):
+      xMid = ((parentPt[0]-cntrPt[0])/2.0) + cntrPt[0]
+      yMid = ((parentPt[1]-cntrPt[1])/2.0) + cntrPt[1]
+      createPlot.ax1.text(xMid, yMid, txtString)
+
+  # 绘制树
+  def plotTree(myTree, parentPt, nodeTxt):
+      # 计算树的宽高
+      numLeafs = getNumLeafs(myTree)
+      depth = getTreeDepth(myTree)
+      firstStr = myTree.keys()[0]
+      cntrPt = (plotTree.xOff + (1.0+float(numLeafs))/2.0/plotTree.totalW,\
+                plotTree.yOff)
+      plotMidText(cntrPt, parentPt, nodeTxt)
+      plotNode(firstStr, cntrPt, parentPt, dicisionNode)
+      secondDict = myTree[firstStr]
+      plotTree.yOff = plotTree.yOff - 1.0/plotTree.totalD
+      for key in secondDict.keys():
+          if type(secondDict[key]).__name__ == 'dict':
+              plotTree(secondDict[key], cntrPt, str(key))
+          else:
+              plotTree.xOff = plotTree.xOff + 1.0/plotTree.totalW
+              plotNode(secondDict[key], (plotTree.xOff, plotTree.yOff), \
+                       cntrPt, leafNode)
+              plotMidText((plotTree.xOff, plotTree.yOff), cntrPt, str(key))
+      plotTree.yOff = plotTree.yOff + 1.0/plotTree.totalD
+
+  def createPlot(inTree):
+      fig = plt.figure(1, facecolor='white')
+      fig.clf()
+      axprops = dict(xticks = [], yticks=[])
+      createPlot.ax1 = plt.subplot(111, frameon=False, **axprops)
+      plotTree.totalW = float(getNumLeafs(inTree))
+      plotTree.totalD = float(getTreeDepth(inTree))
+      plotTree.xOff = -0.5/plotTree.totalW; plotTree.yOff = 1.0
+      plotTree(inTree, (0.5, 1.0), '')
+      plt.show()
 ```
 
 基于概率论的分类方法：朴素贝叶斯
@@ -915,7 +993,7 @@ $P(y_i)$ 称为 $y_i$ 的先验概率， 通过计算不同 $y_i$
           return p0Vec, p1Vec, pAbusive
     ```
 
-3.  给定单词向量，进行分类
+3.  分类器：给定单词向量，进行分类
 
     ``` {.python}
       def classifyNB(vec2Classify, p0Vec, p1Vec, pClass1):
@@ -968,7 +1046,6 @@ $P(y_i)$ 称为 $y_i$ 的先验概率， 通过计算不同 $y_i$
               # 打印错误率
               print('the error rate is: ', float(errorCount/len(testList)))
     ```
-
 
 ### 场景二 朴素贝叶斯分类器从个人广告中获取区域倾向
 
@@ -1086,3 +1163,5 @@ $P(y_i)$ 称为 $y_i$ 的先验概率， 通过计算不同 $y_i$
               # 打印错误率
               print('the error rate is: ', float(errorCount/len(testList)))
     ```
+
+

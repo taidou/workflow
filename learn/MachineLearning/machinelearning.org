@@ -817,7 +817,7 @@
 
          return p0Vec, p1Vec, pAbusive
    #+END_SRC
-3. 给定单词向量，进行分类
+3. 分类器：给定单词向量，进行分类
    #+BEGIN_SRC python
      def classifyNB(vec2Classify, p0Vec, p1Vec, pClass1):
          # 概率用 log 值表示
@@ -846,6 +846,107 @@
              randomIdx = int(random.uniform(0, len(trainingList)))
              testList.append(trainingList[randomIdx])
              # 将测试邮件从训练集中删除
+             del(trainingList[randomIdx])
+
+         # 构建训练算法所需要的参数
+         trainMat = []; trainClasses = []
+         for docIdx in trainingList:
+             trainMat.append(bagOfWords2VecMN(vocabList, docList[docIdx]))
+             trainClasses.append(classList[docIdx])
+
+         # 执行训练算法，获得概率向量
+         # 注意将 list 转换为 mat
+         p0V, p1V, pSpam = trainNB0(array(trainMat), array(trainClasses))
+
+         errorCount = 0.0
+         for docIdx in testList:
+             wordVector = bagOfWords2VecMN(vocabList, docList[docIdx])
+             if classifyNB(array(wordVector), p0V, p1V, pSpam) != classList[docIdx]:
+                 errorCount += 1
+                 print("classification error: ", docList[docIdx])
+             # 打印错误率
+             print('the error rate is: ', float(errorCount/len(testList)))
+   #+END_SRC
+*** 场景二 朴素贝叶斯分类器从个人广告中获取区域倾向
+不同城市的人发布的征婚广告，通过分析网站 'Cragslist' 上的RSS信息，我们可以比较不同城市对于
+征婚关心的内容差异。分析RSS信息的工具可以采用 =Python= 的 =feedparser= 库
+**** 考虑
+1. 可用的 Rss 源
+2. 不同城市对应的 Rss 信息描述
+   1) 属性值一样用一个 'vocabList' 来描述
+   2) 'vocabList' 创建方式与场景一雷同
+   3) 分割 xml 网页的工具，使用 =feedparser= , 介绍可见网页
+      [[http://www.cnblogs.com/MrLJC/p/3731213.html][python解析RSS(feedparser)]]
+3. 朴素贝叶斯算法实现
+4. 需要去除词频最高的词语，取排行前 30 的单词
+**** 实现
+1. 分词器
+   #+BEGIN_SRC python
+     import re
+
+     def loadFromRSS(feed):
+         data = feed['summary']
+         regEx = re.compile('\W*')
+         wordList = regEx.split(data)
+         return [tok.lower() for tok in wordList if len(tok) > 2]
+   #+END_SRC
+2. 创建词汇表
+   #+BEGIN_SRC python
+     def createVocabList(docList):
+         vocabSet = set([])
+         for document in docList:
+             vocabSet = vocabSet | set(document)
+         return list(vocabSet)
+   #+END_SRC
+3. 文档描述
+   1) 与场景一处理方式相同，但是考虑到要挑选出词频最高单词，多加一个 'fulltexts' 的向量
+      用来存放所有的词汇
+      #+BEGIN_SRC python
+        from numpy import *
+        from os import listdir
+        from os import path
+        import re
+
+        def loadDoc():
+            ny = feedparser.parser("http://newyork.craiglist.org/search/stp?format=rss")
+            sf = feedparser.parser("http://sfbay.craiglist.org/search/stp?format=rss")
+
+        docList = []; classList = []; fullText = []
+        minLen = min(len(ny['entries']), len(sf['entries']))
+        # 注意 docList 与 fullText 区别
+        # 前者以 vector 为一个 entry， 后者以一个单词为一个 entry
+        for i in range(minLen):
+            wordList = loadFromRSS(ny['entries'][i])
+            docList.append(wordList)
+            fullText.extend(wordList)
+            classList.append(1)
+            wordList = loadFromRSS(sf['entries'][i])
+            docList.append(wordList)
+            fullText.extend(wordList)
+            classList.append(0)
+        return docList, classList, fullText, minLen
+      #+END_SRC                                                                     
+4. 贝叶斯算法训练函数，与场景一相同
+5. 分类器，与场景一相同
+6. 测试
+   #+BEGIN_SRC python
+     def loacalWords():
+         # 原始文档，对应标签向量
+         docList, classList, fullText, minLen = localDoc()
+         # 词汇表
+         vocabList = createVocabList(docList)
+
+         # 去除高频词汇
+         top30Words = calcMostFreq(vocabList, fullText)
+         for pairW in top30Words:
+             if pairW[0] in vocabList: vocabList.remove(pairW[0])
+
+         # 初始化训练数据集和测试数据集
+         trainingList = range(2*minLen); testList = []
+         for i in range(10):
+             randomIdx = int(random.unifor(0, len(trainingList)))
+             testList.append(trainingList[randomIdx])
+             # 将测试广告从训练集中删除
              del(trainingList[randomIdx])
 
          # 构建训练算法所需要的参数
