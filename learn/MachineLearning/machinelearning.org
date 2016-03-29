@@ -911,24 +911,45 @@
             ny = feedparser.parser("http://newyork.craiglist.org/search/stp?format=rss")
             sf = feedparser.parser("http://sfbay.craiglist.org/search/stp?format=rss")
 
-        docList = []; classList = []; fullText = []
-        minLen = min(len(ny['entries']), len(sf['entries']))
-        # 注意 docList 与 fullText 区别
-        # 前者以 vector 为一个 entry， 后者以一个单词为一个 entry
-        for i in range(minLen):
-            wordList = loadFromRSS(ny['entries'][i])
-            docList.append(wordList)
-            fullText.extend(wordList)
-            classList.append(1)
-            wordList = loadFromRSS(sf['entries'][i])
-            docList.append(wordList)
-            fullText.extend(wordList)
-            classList.append(0)
-        return docList, classList, fullText, minLen
-      #+END_SRC                                                                     
+            docList = []; classList = []; fullText = []
+            minLen = min(len(ny['entries']), len(sf['entries']))
+            # 注意 docList 与 fullText 区别
+            # 前者以 vector 为一个 entry， 后者以一个单词为一个 entry
+            for i in range(minLen):
+                wordList = loadFromRSS(ny['entries'][i])
+                docList.append(wordList)
+                fullText.extend(wordList)
+                classList.append(1)
+                wordList = loadFromRSS(sf['entries'][i])
+                docList.append(wordList)
+                fullText.extend(wordList)
+                classList.append(0)
+                return docList, classList, fullText, minLen
+      #+END_SRC
+
+   2) 用属性值描述文件，函数 =bagOfWords2VecMN= 与场景一相同
 4. 贝叶斯算法训练函数，与场景一相同
 5. 分类器，与场景一相同
-6. 测试
+6. 计算频次最高的 30 个单词
+   #+BEGIN_SRC python
+     def calcMostFreq(vocabList, fullText):
+         import operator
+
+         # 存储词频的字典
+         freqDict = {}
+
+         # 遍历词汇表中的每个单词
+         for token in vocabList:
+             # 在全文列表中查找词出现的频次
+             freqDict[token] = fullText.count(token)
+
+         # 对词频字典进行排序
+         sortedFreq = sorted(freqDict.items(), key=operator.itemgetter(1), reverse=True)
+
+         # 返回前 30 个单词
+         return sortedFreq[:30]
+   #+END_SRC
+7. 测试
    #+BEGIN_SRC python
      def loacalWords():
          # 原始文档，对应标签向量
@@ -941,7 +962,7 @@
          for pairW in top30Words:
              if pairW[0] in vocabList: vocabList.remove(pairW[0])
 
-         # 初始化训练数据集和测试数据集
+         # 随机从 docList 中抽取 10 个 vector 作为测试
          trainingList = range(2*minLen); testList = []
          for i in range(10):
              randomIdx = int(random.unifor(0, len(trainingList)))
@@ -949,6 +970,7 @@
              # 将测试广告从训练集中删除
              del(trainingList[randomIdx])
 
+         # 初始化训练数据集和测试数据集
          # 构建训练算法所需要的参数
          trainMat = []; trainClasses = []
          for docIdx in trainingList:
@@ -968,3 +990,65 @@
              # 打印错误率
              print('the error rate is: ', float(errorCount/len(testList)))
    #+END_SRC
+* 基于最优化方法的最佳回归系数确定 (二分类)
+** 概述
+*** 朴素贝叶斯方法回顾归纳
+回顾朴素贝叶斯方法，分为以下步骤：
+1. 确定属性值
+2. 确定属性值对应分类的后验概率
+3. 确定不同分类的先验概率
+4. 输入要分类的实例，用确定好的属性值表示实例，通过计算所有属性概率之积(log值为求和)，通过
+   比较不同分类对应实例的后验概率大小，以此确定实例分类
+*** 基于最优化方法的最佳回归系数确定
+1. 实例的描述
+   类似朴素贝叶斯做法，我们用一系列属性值来表征实例，但是不同属性权重不一定相同：
+   #+BEGIN_SRC latex
+   Z = \theta_{0}x_{0} + \theta_{1}x_{1} + \ldots + \theta_{N}x_{N}
+   #+END_SRC   
+   上式， $x_{i}$ 表示实例属性， $\theta_{i}$ 表征属性权重， $Z$ 代表实例
+2. 属性权重对实例分类影响
+   + 不同类别的后验概率可以表示为 $P(class|Z)$，参考朴素贝叶斯方法，不同类别的后验概率可以进行
+     比较，然后以此确定实例所属的类别。对于二分类的问题，实例所属类别只有两种，是非此即彼的。于是，
+     对于 $P(class1|Z) > 0.5$ 的情况，我们可以认为是 'class1' 类的实例， 
+     $P(class1|Z) <= 0.5$ 的情况，则可以认为是 'not class1' 类的实例。
+   + 现在的问题在于，如何描述 $P(class|Z)$
+     我们可以知道 $P(class|Z)$ 的性质是非此即彼的，这个性质有点类似数学上的阶跃函数，但是，
+     数学上的阶跃函数一方面处理比较困难，我们实际的实例图很可能没有一个很明确的界限，在界限
+     一边都是类别1，在界限另一边都是类别2
+     [[file:figs/logistic_01.png]]
+     因此，可以采用类似阶跃函数的一个函数 =sigmoid= 函数
+     #+BEGIN_SRC latex
+       \begin{equation}
+       g(Z) = \frac{1}{1+e^{-Z}}
+       \end{equation}
+     #+END_SRC
+     作为概率的描述， $g(Z) > 0.5$ 我们就认为实例 $Z$ 属于类别1，否则属于另一个类别2。
+   + =Sigmoid= 函数性质
+     1) $g(Z) > 0.5$ 当 $Z > 0$时； $g(Z) < 0.5$ 当 $Z < 0$时；$g(Z) = 0.5$ 当 $Z = 0$时
+        [[file:figs/logistic_02.png]]
+     2) $Z$ 越大，对应的 $g(Z)$ 越大，且随着 $Z$ 不断增大， $g(Z)$ 无限趋近 1；反之，则
+        $g(Z)$ 无限趋近与0
+     3) 对 $g(Z)$ 求导的结果是：
+        #+BEGIN_SRC latex
+          \begin{equation}
+          g^{\prime}(z) = g(Z)\cdot{}(1-g(Z))
+          \end{equation}
+        #+END_SRC
+3. 由上面的讨论可知，用 =sigmoid= 函数作为实例 $Z$ 分类概率的描述是比较合适的描述，下面需要做的是
+   如何确定 $Z$ 不同属性的权重，我们已知了训练集的不同实例的属性值 $(x_0, x_1, \ldots, x_N)$ 
+   和训练集不同实例的分类，需要求实例不同属性的权重，可以采用极大似然法
+   1) 假设对于一个实例分类的概率为
+      #+BEGIN_SRC latex
+        \begin{equation}
+          P(y|{\bm x};{\bm \theta}) = (h_{{\bm \theta}}(x))^y(1-h_{{\bm \theta}}(x))^{1-y}
+          \end{equation}
+      #+END_SRC
+   2) 对于训练集整个体系，其总体分布概率可以表示为
+      #+BEGIN_SRC latex
+        \begin{eqnarray}
+          L({\bm \theta}) &=& \prod^{m}_{i=1}p(y^{i}|{\bm X}^{i};{\bm \theta})\\\nonumber
+          {} &=& \prod^{m}_{i=1}(h_{\bm \theta}({\bm x}^{i}))^y^{i}(1-h_{\bm \theta}({\bm x}^{i}))^{1-y^i}
+          \end{eqnarray}
+      #+END_SRC
+   3) 对数形式的分布概率也可以比较容易的表示出来
+   4) 对似然函数取极值可以得到系统最可能的分布，取极值也就是对应我们的梯度下降(上升法)
