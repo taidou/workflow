@@ -664,3 +664,309 @@ k-近邻算法(kNN)
       plotNode(U'决策节点', (0.5， 0.1), (0.1, 0.5), decisionNode)
       plotNode(U'叶节点', (0.8， 0.1), (0.3, 0.5), leafNode)
 ```
+
+基于概率论的分类方法：朴素贝叶斯
+================================
+
+概述
+----
+
+### 概念
+
+事物有许多属性，譬如一个事物 \$X\$，可以定义其一系列属性
+
+``` {.latex}
+  \begin{equation}
+   $X = (x_1, x_2, x_3, \ldots)$
+  \end{equation}
+```
+
+作为其描述，而不同事物可能归属不同种类，可以用集合 $Y$
+作为各种不同种类的描述，
+
+``` {.latex}
+  \begin{equation}
+  Y = y_1, y_2, \ldots, y_m
+  \end{equation}
+```
+
+当给出任意一个事物 $X^{\prime}$
+的时候，我们需要预测这个事物到底属于哪个种类 \$y^′^\$。
+朴素贝叶斯理论做了一个假设，认为任意一个实例不同属性之间相互独立，这样，可以计算一个实例，其处于
+不同种类之间的概率，选择概率最大的一个种类作为该实例种类的预测。如果定义
+$P(y_i|X)$ 作为 $y_i$ 的 后验概率，表示实例 $X$ 属于种类 $y_i$ 的概率，
+$P(y_i)$ 称为 $y_i$ 的先验概率， 通过计算不同 $y_i$
+的后验概率，其中数值最大对应 $y_i$ 可以作为 $X$ 种类的预测。
+
+实际我们可以直接得到的，一般是 $X$ 的后验概率 $P(X|y_i)$ (相当于 $X$
+的属性出现在 $y_i$ 类的概率总和) 和 $P(y_i)$
+的先验概率，但是，通过贝叶斯公式，我们可以求得 $X$ 的先验概率：
+
+``` {.latex}
+  \begin{equation}
+  P(y_i|X) = \frac{P(X|y_i)P(y_i)}{P(X)}
+  \end{equation}
+```
+
+### 特点
+
+-   优点：数据较少的情况下仍然有效，可以处理多类别问题
+-   缺点：对于输入数据的准备方式较为敏感
+-   适用数据类型：标称型数据
+
+### 举例说明
+
+#### 说明
+
+考虑一个医疗诊断问题，有两种可能假设： 1). 病人有癌症 2).
+病人没癌症。样本数据来自某化验测试，测试结果有两种 1). 阳性 2). 阴性。
+假如我们已经知道了普通人中只有 0.008
+的人会患病。此外，化验结果对有病的患者有 98% 的可
+能返回阳性结果，对无病患者有 97%
+概率返回阴性结果。此时，有一个病人化验测试结果时阳性，是否可以将病人诊断为得了
+癌症。
+
+#### 考虑
+
+``` {.latex}
+  \begin{alignat}{2}
+   \P(canser) &= 0.008  &\quad P(no canser) &= 0.992 \\  
+   \P(positive|canser) &= 0.98  &\quad P(negative|canser) &= 0.02 \\  
+   \P(positive|no canser) &= 0.03  &\quad P(negative|no canser) &= 0.97  
+  \end{alignat}
+```
+
+这样，通过贝叶斯公式，我们可以求得该病人测试结果为阳性时，其得癌与不得癌的概率：
+
+``` {.latex}
+  \begin{eqnarray}
+    P(canser|positive) &=& \frac{P(positive|canser)P(canser)}{P(positive)}\\\nolinenumber
+    {} & = & \frac{0.98\times{}0.008}{P(positive)}\\\nolinenumber
+    {} & = & \frac{0.0078}{P(positive)}\\
+    P(no canser|positive) & = & \frac{P(positive|no canser)P(no canser)}{P(positive)}\\\nolinenumber
+    {} & = & \frac{0.03\times{}0.992}{P(positive)}\\\nolinenumber
+    {} & = & \frac{0.0298}{P(positive)}
+  \end{eqnarray}
+```
+
+可以看出，该患者不得癌的概率更大，按照朴素贝叶斯的方法，我们认为其没有癌症。除此之外，我们还可以看出，我们不需要关系贝叶斯
+公式的分母部分，只需要考察分子部分大小即可。
+
+示例
+----
+
+### 场景一 利用朴素贝叶斯方法过滤垃圾邮件
+
+数据集包含50封邮件，其中25封为垃圾邮件，随机将数据集切分为训练集(40封)和测试集(10封)。邮件目录为
+'email'，下面又分为两个目录，分别为 'ham' 和
+'spam'，存放普通邮件与垃圾邮件。
+
+#### 考虑
+
+1.  实例与类别的考虑：实例是邮件，类别是 'spam' 和 'ham'
+    -   一个邮件相当于一个实例，其由一个个单词组成，因此，可以考虑用单词作为其属性的表述
+    -   很多邮件的单词会有重叠，用所有英文单词作为属性去描述邮件，工作量太大，因此，可以考虑将用于训练的邮件中
+        所有不重复的单词作成一个词汇表，词汇表中的单词作为不同邮件的描述
+    -   一个词汇表相当于 \$(x~1~, x~2~, …,
+        x~m~)\$，一个邮件相当于一个实例，实例对应的属性(词汇表中的单词)值
+        就是词汇表中不同单词出现的次数，譬如：
+
+        ``` {.example}
+          vocabList = ['hello', 'world', 'sun', 'moon', 'good'] # 5 个属性
+          docWordList1 = ['ni', 'hao', 'sun', 'is', 'big', 'world', 'good', 'world']
+          docWordList2 = ['hello', 'beautiful', 'girl']
+          docWordList1 -- vectorize --> [0, 2, 1, 0, 1] # 用 5 个属性表述结果
+          docWordList2 -- vectorize --> [1, 0, 0, 0, 0] # 用 5 个属性表述结果
+        ```
+
+2.  词汇表的创建分为两步：
+    1.  文档的分割，变成 '词汇'(words) 的组合
+    2.  所有文档的词汇组合，创建词汇表
+
+3.  实例的表述
+    1.  初始化一个长度等于 'vocabList' 的 'vector'
+    2.  对应每个属性，输入实例的属性值
+
+4.  算法实现
+    1.  输入参数为训练集(所有文档表述组合成的matrix)和labels
+    2.  计算每个属性对应的先验概率 $P(x_i|y_i)$
+
+#### 实现
+
+1.  词汇表创立与文档描述
+    1.  文档分割
+
+        ``` {.python}
+          import re
+
+          def loadEmailFile(filename):
+              fr = open(filename)
+
+              # 分割邮件为单词的组合，去除空格与标点
+              regEx = re.compile('\W*')
+              wordList = regEx.split(fr.read())
+
+              # 考虑到可能出现的网址，有可能出现类似 py 等单词，需要这种情况排除
+              return [tok.lower() for tok in wordList if len(tok) > 2]
+        ```
+
+    2.  原始文档集
+        -   将各文档列出
+
+        -   分割单词
+
+        -   每个文档作为一个 vector, 填入分割出来的单词
+
+            ``` {.python}
+              from numpy import *
+              from os import listdir
+              from os import path
+              import re
+
+              def loadDoc():
+                  spamDir = "./email/spam"
+                  hamDir = "./email/ham"
+                  spamMailList = []
+                  hamMailList = []
+                  spamMailList = [path.join(spamDir, spamEmail) for spamEmail in listdir(spamDir)]
+                  hamMailList = [path.join(hamDir, hamEmail) for hamEmail in listdir(hamDir)]
+
+                  # 定义 docList 存放原始 email 内容
+                  docList = []
+                  # 同时按照 doc 顺序存入 label， 1 表示 'spam'， '0' 表示 'ham'
+                  classList = []
+                  for mail in spamMailList:
+                      wordList = loadEmailFile(mail)
+                      docList.append(wordList)
+                      classList.append(1)
+                  for mail in hamMailList:
+                      wordList = loadEmailFile(mail)
+                      docList.append(wordList)
+                      classList.append(0)
+                  return docList, classList
+            ```
+
+    3.  词汇表创建
+
+        ``` {.python}
+          # 这里 docList 是不同文档原始单词表示的 vector
+          def createVocabList(docList):
+              vocabSet = set([])
+              for document in docList:
+                  vocabSet = vocabSet | set(document)
+              return list(vocabSet)
+        ```
+
+    4.  原始文档集用词汇表表示
+
+        ``` {.python}
+          def bagOfWords2VecMN(vocabList, inputSet):
+              # 初始化词向量，每个元素对应词汇表中的一个单词，初始值为 0
+              returnVec = [0] * len(vocabList)
+
+              # 遍历输入的邮件，每遇到一个词， 词向量对应值加 1
+              for word in inputSet:
+                  if word in vocabList:
+                      returnVec[vocabList.index(word)] += 1
+              return returnVec
+        ```
+
+2.  算法实现
+
+    ``` {.python}
+      def trainNB0(trainMatrix, trainCategory):
+          # 文档数量
+          numTrainDocs = len(trainMatrix)
+          # 属性数量
+          numWords = len(trainMatrix[0])
+
+          # 初始化
+          # 'spam' 对应的先验概率
+          # 需要注意的是， 'ham' 对应的 'traincategory' 为 0，因此 sum(trainCategory) 是 'spam' 数目
+          pAbusive = sum(trainCategory)/float(numTrainDocs)
+          # 原本是定义一个初始 list， 用来存放 'ham' 和 'spam' 对应属性值的和
+          # 正常是 p0Num = zeros(numWords); p1Num = zeros(numWords)
+          # 考虑到可能出现某属性值的概率为 0，因此用 1 作为初始向量
+          p0Num = ones(numWords); p1Num = ones(numWords)
+          # 对应的 'ham' 与 'spam' 类别对应的总数用 p0Denom 与 p1Denom 表示
+          # 初始值也应该设置为 0.0，考虑到 p0Num 与 p1Num 已经设置为 (1,...) vector
+          # 将 p0Denom 与 p1Denom 设置为一个不为 1 的数
+          p0Denom = 2.0; p1Denom = 2.0
+
+          # 遍历文档，计算每个属性值的概率
+          for i in list(range(numTrainDocs)):
+              # 判断 'spam'
+              if trainCategory[i] == 1:
+                  # 对应的存放 'spam' vector，其加上标志为 'spam' 邮件的实例
+                  # 标志为 'spam' 邮件的实例表示类似 [1, 0, 1, 0, ...]
+                  # 按文档相加，最后得到的是每个属性出现次数
+                  p1Num += trainMatrix[i]
+                  # 相应的，将标志为 'spam' 的文档所有属性相加
+                  # 遍历文档后，这个值是对应 'spam' 种类中所有属性值之和
+                  p1Denom += sum(trainMatrix[i])
+              else:
+                  p0Num += trainMatrix[i]
+                  p0Denom += sum(trainMatrix[i])
+
+          # 概率表示用 log 型
+          p1Vec = log(p1Num/p1Denom)
+          p0Vec = log(p0Num/p0Denom)
+
+          return p0Vec, p1Vec, pAbusive
+    ```
+
+3.  给定单词向量，进行分类
+
+    ``` {.python}
+      def classifyNB(vec2Classify, p0Vec, p1Vec, pClass1):
+          # 概率用 log 值表示
+          # 一个实例 vec2Classify，其表示为各个属性(单词表向量)的数量值
+          # 将实例 vec2Classify 乘以 我们利用训练集得到的每个属性的概率值
+          # 然后乘以对应 class 的先验概率就可以得到我们需要求的概率值
+          # log 型概率求和对应原始概率乘积
+          p1 = sum(vec2Classify*p1Vec) + log(pClass1)
+          p0 = sum(vec2Classify*p0Vec) + log(1.0-pClass1)
+          if p1 > p0:
+              return 1
+          else:
+              return 0
+    ```
+
+4.  测试算法
+
+    ``` {.python}
+      def spamTest():
+          # 原始文档，对应标签向量
+          docList, classList = loadDoc()
+          # 词汇表
+          vocabList = createVocabList(docList)
+
+          # 随机从 docList 中抽取 10 个 vector 作为测试
+          trainingList = range(50); testList = []
+          for i in list(range(10)):
+              randomIdx = int(random.uniform(0, len(trainingList)))
+              testList.append(trainingList[randomIdx])
+              # 将测试邮件从训练集中删除
+              del(trainingList[randomIdx])
+
+          # 构建训练算法所需要的参数
+          trainMat = []; trainClasses = []
+          for docIdx in trainingList:
+              trainMat.append(bagOfWords2VecMN(vocabList, docList[docIdx]))
+              trainClasses.append(classList[docIdx])
+
+          # 执行训练算法，获得概率向量
+          # 注意将 list 转换为 mat
+          p0V, p1V, pSpam = trainNB0(array(trainMat), array(trainClasses))
+
+          errorCount = 0.0
+          for docIdx in testList:
+              wordVector = bagOfWords2VecMN(vocabList, docList[docIdx])
+              if classifyNB(array(wordVector), p0V, p1V, pSpam) != classList[docIdx]:
+                  errorCount += 1
+                  print("classification error: ", docList[docIdx])
+              # 打印错误率
+              print('the error rate is: ', float(errorCount/len(testList)))
+    ```
+
+
