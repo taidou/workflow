@@ -1,5 +1,20 @@
 #+TITLE: 机器学习笔记
 #+AUTHOT: 胡琛
+#+EMAIL: curiousbull@163.com
+
+#+LATEX_HEADER: \usepackage[vcentermath]{youngtab}
+#+LATEX_HEADER: \usepackage{braket}
+#+LATEX_HEADER: \usepackage{mathrsfs}
+#+LATEX_HEADER: \usepackage{txfonts}
+#+LATEX_HEADER: \newcommand{\bm}[1]{\mbox{\boldmath{$#1$}}}
+#+LATEX_HEADER: \newenvironment{sequation}{\begin{equation}\small}{\end{equation}}
+#+LATEX_HEADER: \newenvironment{tequation}{\begin{equation}\tiny}{\end{equation}}
+#+LATEX_HEADER: \newcommand\relphantom[1]{\mathrel{\phantom{#1}}}
+#+LATEX_HEADER: \newcommand\ve{\varepsilon}  
+#+LATEX_HEADER: \newcommand\tve{t_{\varepsilon}}
+#+LATEX_HEADER: \newcommand\vf{\varphi}      
+#+LATEX_HEADER: \newcommand\yvf{y_{\varphi}}
+#+LATEX_HEADER: \newcommand\bfE{\mathbf{E}}
 
 * 机器学习基础
 1. 概念：何为机器学习，将无序的数据转换成有用的信息
@@ -232,31 +247,23 @@
 *** =ID3= 算法(仅对于属性离散且不要求生成二叉树的情况讨论)
 如果待分类的事物可能划分在多个分类中，譬如，设D为用类别对训练元组进行的划分
 1. 符号 $x_i$ 信息的定义：
-   #+BEGIN_SRC latex
      \begin{equation}
        l(x_i) = -\log_{2}p(x_i)
      \end{equation}
-   #+END_SRC
    其中$p_(x_i)$表示第i个类别在整个训练元组出现的概率
 2. D的熵(entropy)定义
-   #+BEGIN_SRC latex
      \begin{equation}
        info(D) = -\sum^n_{i=1}p(x_i)\log_{2}p(x_i)
      \end{equation}
-   #+END_SRC
    熵的实际意义表示D中元组的类标号所需要的平均信息量。
 3. 假设训练元组D按属性A划分，则该划分的熵计算如下：
-   #+BEGIN_SRC latex
      \begin{equation}
        info_A(D)=\sum^{\nu}_{j=1}\frac{D_i}{D}info(D_j)
      \end{equation}
-   #+END_SRC
 5. 将D按属性A划分后，信息增益为两者的差值
-   #+BEGIN_SRC latex
      \begin{equation}
        gain(A) = info(D) - info_A(D)
      \end{equation}
-   #+END_SRC
 6. 将D按所有属性进行划分，计算各种划分的信息增益，选择增益最大的属性进行划分，之后递归至
    + 划分后的所有分支内的元素都属于同一类别
    + 可用于划分的属性已使用完
@@ -618,17 +625,13 @@
 ** 概述
 *** 概念
 事物有许多属性，譬如一个事物 $X$，可以定义其一系列属性
-#+BEGIN_SRC latex
   \begin{equation}
    $X = (x_1, x_2, x_3, \ldots)$
   \end{equation}
-#+END_SRC
 作为其描述，而不同事物可能归属不同种类，可以用集合 $Y$ 作为各种不同种类的描述，
-#+BEGIN_SRC latex
   \begin{equation}
   Y = y_1, y_2, \ldots, y_m
   \end{equation}
-#+END_SRC
 当给出任意一个事物 $X^{\prime}$ 的时候，我们需要预测这个事物到底属于哪个种类 $y^{\prime}$。
 朴素贝叶斯理论做了一个假设，认为任意一个实例不同属性之间相互独立，这样，可以计算一个实例，其处于
 不同种类之间的概率，选择概率最大的一个种类作为该实例种类的预测。如果定义 $P(y_i|X)$ 作为 $y_i$ 的
@@ -637,11 +640,9 @@
 
 实际我们可以直接得到的，一般是 $X$ 的后验概率 $P(X|y_i)$ (相当于 $X$ 的属性出现在 $y_i$ 类的概率总和)
 和 $P(y_i)$ 的先验概率，但是，通过贝叶斯公式，我们可以求得 $X$ 的先验概率：
-#+BEGIN_SRC latex
   \begin{equation}
   P(y_i|X) = \frac{P(X|y_i)P(y_i)}{P(X)}
   \end{equation}
-#+END_SRC
 *** 特点
 + 优点：数据较少的情况下仍然有效，可以处理多类别问题
 + 缺点：对于输入数据的准备方式较为敏感
@@ -653,15 +654,12 @@
 能返回阳性结果，对无病患者有 97% 概率返回阴性结果。此时，有一个病人化验测试结果时阳性，是否可以将病人诊断为得了
 癌症。
 **** 考虑
-#+BEGIN_SRC latex
   \begin{alignat}{2}
    \P(canser) &= 0.008  &\quad P(no canser) &= 0.992 \\  
    \P(positive|canser) &= 0.98  &\quad P(negative|canser) &= 0.02 \\  
    \P(positive|no canser) &= 0.03  &\quad P(negative|no canser) &= 0.97  
   \end{alignat}
-#+END_SRC
 这样，通过贝叶斯公式，我们可以求得该病人测试结果为阳性时，其得癌与不得癌的概率：
-#+BEGIN_SRC latex
   \begin{eqnarray}
     P(canser|positive) &=& \frac{P(positive|canser)P(canser)}{P(positive)}\\\nolinenumber
     {} & = & \frac{0.98\times{}0.008}{P(positive)}\\\nolinenumber
@@ -670,7 +668,6 @@
     {} & = & \frac{0.03\times{}0.992}{P(positive)}\\\nolinenumber
     {} & = & \frac{0.0298}{P(positive)}
   \end{eqnarray}
-#+END_SRC
 可以看出，该患者不得癌的概率更大，按照朴素贝叶斯的方法，我们认为其没有癌症。除此之外，我们还可以看出，我们不需要关系贝叶斯
 公式的分母部分，只需要考察分子部分大小即可。
 ** 示例
@@ -1003,57 +1000,247 @@
 将蓝色线上方作为正方向，下方作为负方向，如果有这么条直线 $y=kx+b$ 的话，那么计算
 不同数据点到直线距离，假如这个带符号的距离我们用 $Z$ 表示的话，那么 $Z>0$ 对应绿
 色圆点类， $Z <= 0$ 对应红色方块类。
-
-*** 基于最优化方法的最佳回归系数确定
-1. 实例的描述
-   类似朴素贝叶斯做法，我们用一系列属性值来表征实例，但是不同属性权重不一定相同：
+**** 三维图像 
+想象在二维平面 $(X1, X2)$ 上加一个轴， $Z$ 轴，数据点在三维空间 $(X1, X2, Z)$
+的分布也是确定的，如果我们设置 $Z$ 轴对应数据点的坐标为数据点到分界线的距离(带符号)，
+三维图像中，点的分类将是非常明确的， $Z$ 轴正半轴对应的 class 就是绿色圆点， $Z$
+轴负半轴对应的 class 就是红色方块
+**** =Sigmoid= 函数引入与体系概描述
+对于之前的考虑，我们用数学上的语言来讲
+1. $Z$ 作为点到分界线距离，与数据点的 $(X1, X2)$ 坐标有关系，因此， $Z$ 的函数
+   关系可以写为 $Z = \omega_{1}x_{1} + \omega_{2}x_{2}$。如果数据点的坐标
+   不止 $(X1, X2)$ 坐标，我们可以有 $Z$ 更普遍的写法：
    #+BEGIN_SRC latex
-   Z = \theta_{0}x_{0} + \theta_{1}x_{1} + \ldots + \theta_{N}x_{N}
-   #+END_SRC   
-   上式， $x_{i}$ 表示实例属性， $\theta_{i}$ 表征属性权重， $Z$ 代表实例
-2. 属性权重对实例分类影响
-   + 不同类别的后验概率可以表示为 $P(class|Z)$，参考朴素贝叶斯方法，不同类别的后验概率可以进行
-     比较，然后以此确定实例所属的类别。对于二分类的问题，实例所属类别只有两种，是非此即彼的。于是，
-     对于 $P(class1|Z) > 0.5$ 的情况，我们可以认为是 'class1' 类的实例， 
-     $P(class1|Z) <= 0.5$ 的情况，则可以认为是 'not class1' 类的实例。
-   + 现在的问题在于，如何描述 $P(class|Z)$
-     我们可以知道 $P(class|Z)$ 的性质是非此即彼的，这个性质有点类似数学上的阶跃函数，但是，
-     数学上的阶跃函数一方面处理比较困难，我们实际的实例图很可能没有一个很明确的界限，在界限
-     一边都是类别1，在界限另一边都是类别2
-     [[file:figs/logistic_01.png]]
-     因此，可以采用类似阶跃函数的一个函数 =sigmoid= 函数
-     #+BEGIN_SRC latex
-       \begin{equation}
-       g(Z) = \frac{1}{1+e^{-Z}}
+     \begin{eqnarray}
+     Z &=& {\bm \omega}\cdot{}{\bm x}\\\nonumber
+       {} &=& \omega_{1}x_{1} + \ldots + \omega_{N}x_{N}
+     \end{eqnarray}
+   #+END_SRC
+2. 对于 $Z$ 与分类之间的关系，按照之前的描述，也变得非常简单，用数学上的 =Heaviside=
+   阶跃函数就可以描述
+   #+BEGIN_SRC latex
+     $$
+     C(Z)=\left\{
+     \begin{array}{rcl}
+     1       &      & {Z      >      0}\\
+     0       &      & {Z \leq 0}
+     \end{array} \right. 
+     $$
+   #+END_SRC
+   其中， $C(Z) =1$ 代表分类为绿色圆点， $C(Z)=0$ 则代表红色方块
+3. 对于阶跃函数，程序上处理会很困难，我们想要的是 $C(Z)$ 随着 $Z$ 的变化，因此确定 
+   $Z({\bm \omega}{\bm x)$ 中的 ${\bm \omega}$，阶跃函数几乎得不到关于 ${\bm \omega}$ 的
+   信息。因此，我们可以采用数学上对于阶跃函数的近似， =sigmoid= 函数来描述分类
+   #+BEGIN_SRC latex
+     \begin{equation}
+       \sigma(Z) = \frac{1}{1+e^{-Z}}
        \end{equation}
-     #+END_SRC
-     作为概率的描述， $g(Z) > 0.5$ 我们就认为实例 $Z$ 属于类别1，否则属于另一个类别2。
-   + =Sigmoid= 函数性质
-     1) $g(Z) > 0.5$ 当 $Z > 0$时； $g(Z) < 0.5$ 当 $Z < 0$时；$g(Z) = 0.5$ 当 $Z = 0$时
-        [[file:figs/logistic_02.png]]
-     2) $Z$ 越大，对应的 $g(Z)$ 越大，且随着 $Z$ 不断增大， $g(Z)$ 无限趋近 1；反之，则
-        $g(Z)$ 无限趋近与0
-     3) 对 $g(Z)$ 求导的结果是：
-        #+BEGIN_SRC latex
-          \begin{equation}
-          g^{\prime}(z) = g(Z)\cdot{}(1-g(Z))
-          \end{equation}
-        #+END_SRC
-3. 由上面的讨论可知，用 =sigmoid= 函数作为实例 $Z$ 分类概率的描述是比较合适的描述，下面需要做的是
-   如何确定 $Z$ 不同属性的权重，我们已知了训练集的不同实例的属性值 $(x_0, x_1, \ldots, x_N)$ 
-   和训练集不同实例的分类，需要求实例不同属性的权重，可以采用极大似然法
-   1) 假设对于一个实例分类的概率为
-      #+BEGIN_SRC latex
-        \begin{equation}
-          P(y|{\bm x};{\bm \theta}) = (h_{{\bm \theta}}(x))^y(1-h_{{\bm \theta}}(x))^{1-y}
-          \end{equation}
-      #+END_SRC
-   2) 对于训练集整个体系，其总体分布概率可以表示为
-      #+BEGIN_SRC latex
-        \begin{eqnarray}
-          L({\bm \theta}) &=& \prod^{m}_{i=1}p(y^{i}|{\bm X}^{i};{\bm \theta})\\\nonumber
-          {} &=& \prod^{m}_{i=1}(h_{\bm \theta}({\bm x}^{i}))^y^{i}(1-h_{\bm \theta}({\bm x}^{i}))^{1-y^i}
-          \end{eqnarray}
-      #+END_SRC
-   3) 对数形式的分布概率也可以比较容易的表示出来
-   4) 对似然函数取极值可以得到系统最可能的分布，取极值也就是对应我们的梯度下降(上升法)
+   #+END_SRC
+   下图是 =sigmoid= 函数随着 $Z$ 变化的变化
+   [[file:figs/logistic_02.png]]
+   可见，大尺度下， =sigmoid= 函数与阶跃函数非常接近。
+4. 对于上述函数 $C(Z)$ 我们也可以理解为 $P(Z)$， $P(Z)$ 对应类别为绿色圆点概率，如果使用 =sigmoid=
+   函数来表述 $P(Z)$ 的话，我们可以认为 $P(Z) > 0.5$ 对应绿色圆点， $P(Z) \leq 0.5$ 对应红色方块。
+5. 对于许多数据点组成的体系而言，其整体概率分布，可以用以下式子表述：
+   #+BEGIN_SRC latex
+     \begin{equation}
+     L({\bm \omega}) = \prod^{m}_{i=1}(h_{{\bm \omega}}(Z^{(i)}))^{y^{(i)}}(1-h_{{\bm \omega}}(Z^{(i)}))^{1-y^{(i)}} 
+     \end{equation}
+   #+END_SRC
+   其中 $y^{(i)}$ 表示第 i 个粒子的分类， 1 表示绿色圆点， 0 表示红色方块； $Z^{(i)}$ 表示第 i 个粒子对应的 $Z$ 值
+   $h_{{\bm \omega}}$ 就是 =sigmoid= 函数， $m$ 表示体系所有的粒子数
+   对数似然函数则如下：
+   #+BEGIN_SRC latex
+     \begin{eqnarray}
+       \mathcal{l}({\bm \omega}) & = & \log{}L({\bm \omega}) \\\nonumber
+       {} & = & \sum^{m}_{i=1}y^{(i)}\log{}h_{\bm \omega}(Z^{(i)})+(1-y^{(i)})\log(1-h_{\bm \omega}(Z^{(i)})) 
+       \end{eqnarray}
+   #+END_SRC
+6. 从概率统计学上讲，求这个体系最可能的分布的话，就是用极大似然拟合，也就是求上述似然函数的最大值。数学上求
+   极值，可以通过求导实现，程序上，可以通过梯度上升法求得。
+**** 梯度上升法
+对于一个函数 $F(Z)$，如果要求得其局部的最大值，如果 $F(Z)$ 在点A可导且可微，那么 $F(Z)$ 沿着其
+梯度方向上升最快，用数学语言表示：
+如果，
+#+BEGIN_SRC latex
+  \begin{equation}
+    b = a + \gamma\nablaF(a)
+    \end{equation}
+#+END_SRC
+其中， $\gamma$ 是一个大于 0 且足够小的数 
+那么，
+#+BEGIN_SRC latex
+  \begin{equation}
+    F(b) \geq F(a)
+    \end{equation}
+#+END_SRC
+于是，从一点 A 出发，每次都取一个局域足够小的点沿着梯度方向移动，我们就可以得到函数 $F(Z)$ 的最大值。
+具体过程可以见下图：
+[[file:figs/logistic_03.png]]
+综上， 对于体系形式可以用下式表示的目标函数
+#+BEGIN_SRC latex
+  \begin{equation}
+    Q(\omege) = \sum^{n}_{i=1}Q_{i}(\omega)
+    \end{equation}
+#+END_SRC
+其中， $\omega$ 是我们需要估计的参数， $Q_{i}$ 对应的是数据集中第 $i$ 个点，传统的梯度上升法估计
+参数 $\omega$ 方法是，利用下式的梯度上升公式进行迭代：
+#+BEGIN_SRC latex
+  \begin{equation}
+    \omega := \omega - \eta\nabla{}Q(\omega) = \omega - \eta\sum^{n}_{i=1}\nabla{}Q_{i}(\omega)
+    \end{equation}
+#+END_SRC
+其中， $\eta$ 是 'step' 大小
+**** 随机梯度上升法
+当数据集中的数据非常多的时候，将所有数据合在一起做梯度上升，工作量太大，此时，每步迭代选取数据集中的一个样本集
+作为整个数据集的近似，然后当新的样本到来时，对分类器进行增量更新，这样一个 "在线学习" 过程，称之为随机梯度上
+升法。
+在随机梯度上升法中， $Q(\omega)$ 梯度的真值 $\nabla{}Q(\omega)$ 由单独的一个样本梯度作为近似：
+#+BEGIN_SRC latex
+  \begin{equation}
+    \omega := \omega - \eta\nabla{}Q_{i}(\omega)
+  \end{equation}
+#+END_SRC
+当算法扫过训练集中所有数据点时，对每个训练样本利用上式对参数 $\omega$ 进行更新。
+以上步骤可以重复多次，直到算法收敛。
+伪代码如下：
+#+BEGIN_EXAMPLE
+  Choose an initial vector of parameters $\omega$ and learning rate $\eta$.
+  Repeat until an approximate minimum is obtained:
+         Randomly shuffle examples in the training set.
+         For $i=1, 2, ..., n$, do:
+             $w := w - \eta \nabla Q_i(w)$.
+#+END_EXAMPLE
+**** 对数型似然函数偏导
+1. 对对数型似然函数 $\mathcal{l}({\bm \omega})$ 求梯度，可以表示为：
+   #+BEGIN_SRC latex
+     \begin{equation}
+       \nabla{}\mathcal{l} = \sum_{i=1}^N\frac{\partial}{\partial{}{\bm \omega}_i}{\bm i}
+       \end{equation}
+   #+END_SRC
+   其中 ${\bm i}$ 表示沿 ${\bm \omega}_i$ 轴方向的单位向量， $N$ 表示空间维数
+2. 对于偏导 $\frac{\partial}{\partial{}{\bm \omega}_i}$，如果采用 =sigmoid= 函数表示 $h({\bm \omega})$，
+   那么数学上可以对偏导数推导如下结果：
+   #+BEGIN_SRC latex
+     \begin{equation}
+       \frac{\partial}{\partial{}{\bm \omega}_j}\mathcal{l}({\bm \omega}) = \sum(y-h_{{\bm \omega}}({\bm x})){\bm x}_j
+     \end{equation}
+   #+END_SRC
+**** 分界线的确定
+当对应的 ${\bm \omega}$ 确定下来后，分界线就是 $Z=0$ 对应的曲线
+*** 示例
+**** 场景一 100 个数据点的分类
+有数据集 'testSet.txt'，一共有 100 行，每行有三个数据，分别代表 $X1$, $X2$ 和分类信息(1或者0)。
+需要利用 =Logistic= 回归分类器找到最佳回归系数。
+***** 考虑
+1. 数据导入
+2. 100个数据点，不需要采用随机上升法，可以使用 '批处理' 方法
+3. 分类信息的描述 =sigmoid= 函数，其梯度函数形式也已知道
+4. $Z = \omega_{0}+\omega_{1}X1 + \omega_{2}X2$，可见，实际我们对于数据点描述可以用三个坐标表示，
+   即 $(1, X1, X2)$
+***** 实现
+1. 数据导入
+   需要注意的是数据点的描述，可以加上一列数值均为 1.0 的量
+   #+BEGIN_SRC python
+     def loadDataSet():
+         fr = open('testSet.txt')
+         dataMat = []; labelMat = []
+         for line in fr.readlines():
+             lineArr = line.strip().split()
+             dataMat.append([1.0, float(lineArr[0]), float(lineArr[1])])
+             labelMat.append(int(lineArr[2]))
+
+         return dataMat, labelMat
+   #+END_SRC
+         
+2. =sigmoid= 函数
+   #+BEGIN_SRC python
+     def sigmoid(inX):
+         return 1.0/(1.0+exp(-inX))
+   #+END_SRC
+
+3. 梯度上升法
+   #+BEGIN_SRC python
+     from numpy import *
+
+     def gradAscent(dataMatIn, classLabels):
+         # 将 array 格式的 dataMatIn 转为 matrix
+         # 以便矩阵运算
+         # 数据集矩阵是 100x3 矩阵， 3 列表示 X0, X1, X2
+         dataMatrix = mat(dataMatIn)
+         # 按道理是方便之后的矩阵运算
+         # 我的理解，列代表坐标，一个数据点表示，需要三个坐标
+         # 体系的描述，需要 100 个 label， 相当于 100 个坐标
+         labelMat = mat(classLabels).transpose()
+
+         # m: 数据点数目; n: 坐标数, 表示空间维数
+         m, n = shape(dataMatrix)
+         # 设置步长
+         alpha = 0.001
+         # 设置最大步数
+         maxCycles = 500
+         # 设置回归系数，应该是 3 个回归系数
+         # 考虑到数据点的三个坐标乘以回归系数
+         # 三个坐标处于矩阵列的位置，相应的，回归系数处于行的位置
+         weights = ones((n, 1))
+         # 在最大步数下，做梯度上升运算，求极大值
+         for k in range(maxCycles):
+             # sigmoid(Z) = sigmoid(w*x)
+             h = sigmoid(dataMatrix*weights)
+             # 在计算 log 型似然函数求偏导时
+             # 其中任意项对j分量偏导化简结果是(y-sigmoid(Z))x_j
+             error = labelMat - h
+             # 阶梯上升下一移动方向与步长
+             # 需要注意的是，对整体的对数似然函数梯度而言
+             # 相当于各数据点的单项似然函数梯度之和
+             # w' = w + \alphax\sum(\nabla(sigmoid(Z(i))))
+             # 需要注意矩阵乘法， error 是 100x3 矩阵
+             weights = weights + alpha*dataMatrix.transpose()*error
+         return weights
+   #+END_SRC
+
+4. 随机梯度上升法
+   #+BEGIN_SRC python
+     def stocGradAscent(dataMatIn, classLabels, numIter = 150):
+         dataMatrix = mat(dataMatIn)
+         m, n = shape(dataMatrix)
+         weights = ones((n,1))
+         for j in range(numIter):
+             dataIdx = list(range(m))
+             for i in range(m):
+                 alpha = 4/(1.0+i+j) + 0.01
+                 randIdx = int(random.uniform(0, len(dataIdx)))
+                 h = sigmoid(sum(dataMatrix[randIdx]*weights))
+                 error = classLabels[randIdx] - h
+                 weights = weights + alpha*error*dataMatrix[randIdx].transpose()
+                 del(dataIdx[randIdx])
+         return weights
+   #+END_SRC
+
+5. 图示
+   注意，输入的参数 'weights' 需要转为 =array= 格式
+   #+BEGIN_SRC python
+     def plotBestFit(weights):
+         import matplotlib.pyplot as plt
+         dataMat, labelMat = loadDataSet()
+         dataArr = array(dataMat)
+         n = shape(dataArr)[0]
+         xcord1 = []; ycord1 = []
+         xcord2 = []; ycord2 = []
+         for i in range(n):
+             if int(labelMat[i]) == 1:
+                 xcord1.append(dataArr[i, 1]); ycord1.append(dataArr[i, 2])
+             else:
+                 xcord2.append(dataArr[i, 1]); ycord2.append(dataArr[i, 2])
+
+         fig = plt.figure()
+         ax = fig.add_subplot(111)
+         ax.scatter(xcord1, ycord1, s=30, c='red', marker='s')
+         ax.scatter(xcord2, ycord2, s=30, c='green')
+         x = arange(-3.0, 3.0, 0.1)
+         y = (-weights[0]-weights[1]*x)/weights[2]
+
+         ax.plot(x, y)
+         plt.xlabel('X1'); plt.ylabel('X2')
+         plt.show()
+   #+END_SRC

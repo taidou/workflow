@@ -1,0 +1,78 @@
+(TeX-add-style-hook
+ "machinelearning"
+ (lambda ()
+   (TeX-add-to-alist 'LaTeX-provided-package-options
+                     '(("youngtab" "vcentermath")))
+   (TeX-run-style-hooks
+    "youngtab"
+    "braket"
+    "mathrsfs"
+    "txfonts")
+   (TeX-add-symbols
+    '("relphantom" 1)
+    '("bm" 1)
+    "ve"
+    "tve"
+    "vf"
+    "yvf"
+    "bfE")
+   (LaTeX-add-labels
+    "ux673aux5668ux5b66ux4e60ux57faux7840"
+    "k-ux8fd1ux90bbux7b97ux6cd5knn"
+    "ux6982ux8ff0"
+    "ux793aux4f8b"
+    "ux573aux666fux4e00-k-ux8fd1ux90bbux7b97ux6cd5ux6539ux8fdbux7ea6ux4f1aux7f51ux7ad9ux914dux5bf9ux6548ux679c"
+    "ux8003ux8651"
+    "ux5b9eux73b0"
+    "ux573aux666fux4e8c-k-ux8fd1ux90bbux7b97ux6cd5ux5b9eux73b0ux624bux5199ux8bc6ux522bux7cfbux7edf"
+    "ux8003ux8651-1"
+    "ux5b9eux73b0-1"
+    "ux6ce8ux610fux70b9"
+    "ux51b3ux7b56ux6811"
+    "ux6982ux8ff0-1"
+    "ux5b9aux4e49"
+    "ux6784ux9020"
+    "id3-ux7b97ux6cd5ux4ec5ux5bf9ux4e8eux5c5eux6027ux79bbux6563ux4e14ux4e0dux8981ux6c42ux751fux6210ux4e8cux53c9ux6811ux7684ux60c5ux51b5ux8ba8ux8bba"
+    "ux793aux4f8b-1"
+    "ux573aux666f-ux51b3ux7b56ux6811ux9884ux6d4bux9690ux5f62ux773cux955cux7c7bux578b"
+    "ux8003ux8651-2"
+    "ux5b9eux73b0-2"
+    "ux4f7fux7528-matplotlib-ux753bux6811ux56fe-ux96beux9700ux56deux987e"
+    "ux5173ux4e8eux6ce8ux91ca"
+    "ux6ce8ux91caux6587ux5b57-annotation-text"
+    "ux5750ux6807ux7cfb-coordinate-system"
+    "ux7badux5934ux6027ux8d28-arrow-properties"
+    "ux7ebfux6761ux6027ux8d28"
+    "ux6ce8ux91caux8f74-annotation-axes"
+    "annotating-with-text-with-box"
+    "anonotating-with-arrow"
+    "ux6811ux8282ux70b9ux6784ux9020"
+    "ux6811ux5927ux5c0fux786eux5b9a"
+    "ux7ed8ux5236ux6811"
+    "ux57faux4e8eux6982ux7387ux8bbaux7684ux5206ux7c7bux65b9ux6cd5ux6734ux7d20ux8d1dux53f6ux65af"
+    "ux6982ux8ff0-2"
+    "ux6982ux5ff5"
+    "ux7279ux70b9"
+    "ux4e3eux4f8bux8bf4ux660e"
+    "ux8bf4ux660e"
+    "ux8003ux8651-3"
+    "ux793aux4f8b-2"
+    "ux573aux666fux4e00-ux5229ux7528ux6734ux7d20ux8d1dux53f6ux65afux65b9ux6cd5ux8fc7ux6ee4ux5783ux573eux90aeux4ef6"
+    "ux8003ux8651-4"
+    "ux5b9eux73b0-3"
+    "ux573aux666fux4e8c-ux6734ux7d20ux8d1dux53f6ux65afux5206ux7c7bux5668ux4eceux4e2aux4ebaux5e7fux544aux4e2dux83b7ux53d6ux533aux57dfux503eux5411"
+    "ux8003ux8651-5"
+    "ux5b9eux73b0-4"
+    "ux57faux4e8eux6700ux4f18ux5316ux65b9ux6cd5ux7684ux6700ux4f73ux56deux5f52ux7cfbux6570ux786eux5b9a-ux4e8cux5206ux7c7b"
+    "ux6982ux8ff0-3"
+    "ux76eeux7684"
+    "ux60f3ux6cd5"
+    "ux70b9ux5230ux7ebfux7684ux8dddux79bb"
+    "ux4e09ux7ef4ux56feux50cf"
+    "sigmoid-ux51fdux6570ux5f15ux5165"
+    "ux57faux4e8eux6700ux4f18ux5316ux65b9ux6cd5ux7684ux6700ux4f73ux56deux5f52ux7cfbux6570ux786eux5b9a")
+   (LaTeX-add-environments
+    "sequation"
+    "tequation"))
+ :latex)
+

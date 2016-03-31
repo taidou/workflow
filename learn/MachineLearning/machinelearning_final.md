@@ -1086,3 +1086,332 @@ $P(y_i)$ 称为 $y_i$ 的先验概率， 通过计算不同 $y_i$
               # 打印错误率
               print('the error rate is: ', float(errorCount/len(testList)))
     ```
+
+基于最优化方法的最佳回归系数确定 (二分类)
+=========================================
+
+概述
+----
+
+按照书里与实验楼给的说明，实在很难理解分界线的意义。为此，这里就我个人理解做了阐述：
+
+### 目的
+
+根据现有数据对分类边界线建立回归公式，以此进行分类。如下图
+![](figs/logistic_01.png)
+蓝色直线上面作为绿色圆点类，直线下部作为红色方块类，蓝色直线就是我们要找到的分类边界线
+
+### 想法
+
+注意： 未必正确，个人思考结果
+
+#### 点到线的距离
+
+将蓝色线上方作为正方向，下方作为负方向，如果有这么条直线 $y=kx+b$
+的话，那么计算 不同数据点到直线距离，假如这个带符号的距离我们用 $Z$
+表示的话，那么 $Z>0$ 对应绿 色圆点类， $Z <= 0$ 对应红色方块类。
+
+#### 三维图像
+
+想象在二维平面 $(X1, X2)$ 上加一个轴， $Z$ 轴，数据点在三维空间
+$(X1, X2, Z)$ 的分布也是确定的，如果我们设置 $Z$
+轴对应数据点的坐标为数据点到分界线的距离(带符号)，
+三维图像中，点的分类将是非常明确的， $Z$ 轴正半轴对应的 class
+就是绿色圆点， $Z$ 轴负半轴对应的 class 就是红色方块
+
+#### `Sigmoid` 函数引入与体系概描述
+
+对于之前的考虑，我们用数学上的语言来讲
+
+1.  $Z$ 作为点到分界线距离，与数据点的 $(X1, X2)$ 坐标有关系，因此， $Z$
+    的函数 关系可以写为 \$Z = *ω*~1~x~1~ +
+    *ω*~2~x~2~\$。如果数据点的坐标 不止 $(X1, X2)$ 坐标，我们可以有 $Z$
+    更普遍的写法：
+
+    ``` {.latex}
+      \begin{eqnarray}
+      Z &=& {\bm \omega}\cdot{}{\bm x}\\\nonumber
+        {} &=& \omega_{1}x_{1} + \ldots + \omega_{N}x_{N}
+      \end{eqnarray}
+    ```
+
+2.  对于 $Z$
+    与分类之间的关系，按照之前的描述，也变得非常简单，用数学上的
+    `Heaviside` 阶跃函数就可以描述
+
+    ``` {.latex}
+      $$
+      C(Z)=\left\{
+      \begin{array}{rcl}
+      1       &      & {Z      >      0}\\
+      0       &      & {Z \leq 0}
+      \end{array} \right. 
+      $$
+    ```
+
+    其中， $C(Z) =1$ 代表分类为绿色圆点， $C(Z)=0$ 则代表红色方块
+3.  对于阶跃函数，程序上处理会很困难，我们想要的是 $C(Z)$ 随着 $Z$
+    的变化，因此确定 $Z({\bm \omega}{\bm x)$ 中的
+    \${\bm*ω*}\$，阶跃函数几乎得不到关于 ${\bm \omega}$ 的
+    信息。因此，我们可以采用数学上对于阶跃函数的近似， `sigmoid`
+    函数来描述分类
+
+    ``` {.latex}
+      \begin{equation}
+        \sigma(Z) = \frac{1}{1+e^{-Z}}
+        \end{equation}
+    ```
+
+    下图是 `sigmoid` 函数随着 $Z$ 变化的变化
+    ![](figs/logistic_02.png) 可见，大尺度下， `sigmoid`
+    函数与阶跃函数非常接近。
+4.  对于上述函数 $C(Z)$ 我们也可以理解为 \$P(Z)\$， $P(Z)$
+    对应类别为绿色圆点概率，如果使用 `sigmoid` 函数来表述 $P(Z)$
+    的话，我们可以认为 $P(Z) > 0.5$ 对应绿色圆点， $P(Z) \leq 0.5$
+    对应红色方块。
+5.  对于许多数据点组成的体系而言，其整体概率分布，可以用以下式子表述：
+
+    ``` {.latex}
+      \begin{equation}
+      L({\bm \omega}) = \prod^{m}_{i=1}(h_{{\bm \omega}}(Z^{(i)}))^{y^{(i)}}(1-h_{{\bm \omega}}(Z^{(i)}))^{1-y^{(i)}} 
+      \end{equation}
+    ```
+
+    其中 $y^{(i)}$ 表示第 i 个粒子的分类， 1 表示绿色圆点， 0
+    表示红色方块； $Z^{(i)}$ 表示第 i 个粒子对应的 $Z$ 值
+    $h_{{\bm \omega}}$ 就是 `sigmoid` 函数， $m$ 表示体系所有的粒子数
+    对数似然函数则如下：
+
+    ``` {.latex}
+      \begin{eqnarray}
+        \mathcal{l}({\bm \omega}) & = & \log{}L({\bm \omega}) \\\nonumber
+        {} & = & \sum^{m}_{i=1}y^{(i)}\log{}h_{\bm \omega}(Z^{(i)})+(1-y^{(i)})\log(1-h_{\bm \omega}(Z^{(i)})) 
+        \end{eqnarray}
+    ```
+
+6.  从概率统计学上讲，求这个体系最可能的分布的话，就是用极大似然拟合，也就是求上述似然函数的最大值。数学上求
+    极值，可以通过求导实现，程序上，可以通过梯度上升法求得。
+
+#### 梯度上升法
+
+对于一个函数 \$F(Z)\$，如果要求得其局部的最大值，如果 $F(Z)$
+在点A可导且可微，那么 $F(Z)$ 沿着其 梯度方向上升最快，用数学语言表示：
+如果，
+
+``` {.latex}
+  \begin{equation}
+    b = a + \gamma\nablaF(a)
+    \end{equation}
+```
+
+其中， $\gamma$ 是一个大于 0 且足够小的数 那么，
+
+``` {.latex}
+  \begin{equation}
+    F(b) \geq F(a)
+    \end{equation}
+```
+
+于是，从一点 A
+出发，每次都取一个局域足够小的点沿着梯度方向移动，我们就可以得到函数
+$F(Z)$ 的最大值。 具体过程可以见下图： ![](figs/logistic_03.png)
+综上， 对于体系形式可以用下式表示的目标函数
+
+``` {.latex}
+  \begin{equation}
+    Q(\omege) = \sum^{n}_{i=1}Q_{i}(\omega)
+    \end{equation}
+```
+
+其中， $\omega$ 是我们需要估计的参数， $Q_{i}$ 对应的是数据集中第 $i$
+个点，传统的梯度上升法估计 参数 $\omega$
+方法是，利用下式的梯度上升公式进行迭代：
+
+``` {.latex}
+  \begin{equation}
+    \omega := \omega - \eta\nabla{}Q(\omega) = \omega - \eta\sum^{n}_{i=1}\nabla{}Q_{i}(\omega)
+    \end{equation}
+```
+
+其中， $\eta$ 是 'step' 大小
+
+#### 随机梯度上升法
+
+当数据集中的数据非常多的时候，将所有数据合在一起做梯度上升，工作量太大，此时，每步迭代选取数据集中的一个样本集
+作为整个数据集的近似，然后当新的样本到来时，对分类器进行增量更新，这样一个
+"在线学习" 过程，称之为随机梯度上 升法。 在随机梯度上升法中，
+$Q(\omega)$ 梯度的真值 $\nabla{}Q(\omega)$
+由单独的一个样本梯度作为近似：
+
+``` {.latex}
+  \begin{equation}
+    \omega := \omega - \eta\nabla{}Q_{i}(\omega)
+  \end{equation}
+```
+
+当算法扫过训练集中所有数据点时，对每个训练样本利用上式对参数 $\omega$
+进行更新。 以上步骤可以重复多次，直到算法收敛。 伪代码如下：
+
+``` {.example}
+  Choose an initial vector of parameters $\omega$ and learning rate $\eta$.
+  Repeat until an approximate minimum is obtained:
+         Randomly shuffle examples in the training set.
+         For $i=1, 2, ..., n$, do:
+             $w := w - \eta \nabla Q_i(w)$.
+```
+
+#### 对数型似然函数偏导
+
+1.  对对数型似然函数 $\mathcal{l}({\bm \omega})$ 求梯度，可以表示为：
+
+    ``` {.latex}
+      \begin{equation}
+        \nabla{}\mathcal{l} = \sum_{i=1}^N\frac{\partial}{\partial{}{\bm \omega}_i}{\bm i}
+        \end{equation}
+    ```
+
+    其中 ${\bm i}$ 表示沿 ${\bm \omega}_i$ 轴方向的单位向量， $N$
+    表示空间维数
+2.  对于偏导 \$\frac{\partial}{\partial{}{\bm \omega}_i}\$，如果采用
+    `sigmoid` 函数表示 \$h({\bm*ω*})\$，
+    那么数学上可以对偏导数推导如下结果：
+
+    ``` {.latex}
+      \begin{equation}
+        \frac{\partial}{\partial{}{\bm \omega}_j}\mathcal{l}({\bm \omega}) = \sum(y-h_{{\bm \omega}}({\bm x})){\bm x}_j
+      \end{equation}
+    ```
+
+#### 分界线的确定
+
+当对应的 ${\bm \omega}$ 确定下来后，分界线就是 $Z=0$ 对应的曲线
+
+### 示例
+
+#### 场景一 100 个数据点的分类
+
+有数据集 'testSet.txt'，一共有 100 行，每行有三个数据，分别代表 $X1$,
+$X2$ 和分类信息(1或者0)。 需要利用 `Logistic`
+回归分类器找到最佳回归系数。
+
+##### 考虑
+
+1.  数据导入
+2.  100个数据点，不需要采用随机上升法，可以使用 '批处理' 方法
+3.  分类信息的描述 `sigmoid` 函数，其梯度函数形式也已知道
+4.  \$Z = *ω*~0~+*ω*~1~X1 +
+    *ω*~2~X2\$，可见，实际我们对于数据点描述可以用三个坐标表示， 即
+    $(1, X1, X2)$
+
+##### 实现
+
+1.  数据导入 需要注意的是数据点的描述，可以加上一列数值均为 1.0 的量
+
+    ``` {.python}
+      def loadDataSet():
+          fr = open('testSet.txt')
+          dataMat = []; labelMat = []
+          for line in fr.readlines():
+              lineArr = line.strip().split()
+              dataMat.append([1.0, float(lineArr[0]), float(lineArr[1])])
+              labelMat.append(int(lineArr[2]))
+
+          return dataMat, labelMat
+    ```
+
+2.  `sigmoid` 函数
+
+    ``` {.python}
+      def sigmoid(inX):
+          return 1.0/(1.0+exp(-inX))
+    ```
+
+3.  梯度上升法
+
+    ``` {.python}
+      from numpy import *
+
+      def gradAscent(dataMatIn, classLabels):
+          # 将 array 格式的 dataMatIn 转为 matrix
+          # 以便矩阵运算
+          # 数据集矩阵是 100x3 矩阵， 3 列表示 X0, X1, X2
+          dataMatrix = mat(dataMatIn)
+          # 按道理是方便之后的矩阵运算
+          # 我的理解，列代表坐标，一个数据点表示，需要三个坐标
+          # 体系的描述，需要 100 个 label， 相当于 100 个坐标
+          labelMat = mat(classLabels).transpose()
+
+          # m: 数据点数目; n: 坐标数, 表示空间维数
+          m, n = shape(dataMatrix)
+          # 设置步长
+          alpha = 0.001
+          # 设置最大步数
+          maxCycles = 500
+          # 设置回归系数，应该是 3 个回归系数
+          # 考虑到数据点的三个坐标乘以回归系数
+          # 三个坐标处于矩阵列的位置，相应的，回归系数处于行的位置
+          weights = ones((n, 1))
+          # 在最大步数下，做梯度上升运算，求极大值
+          for k in range(maxCycles):
+              # sigmoid(Z) = sigmoid(w*x)
+              h = sigmoid(dataMatrix*weights)
+              # 在计算 log 型似然函数求偏导时
+              # 其中任意项对j分量偏导化简结果是(y-sigmoid(Z))x_j
+              error = labelMat - h
+              # 阶梯上升下一移动方向与步长
+              # 需要注意的是，对整体的对数似然函数梯度而言
+              # 相当于各数据点的单项似然函数梯度之和
+              # w' = w + \alphax\sum(\nabla(sigmoid(Z(i))))
+              # 需要注意矩阵乘法， error 是 100x3 矩阵
+              weights = weights + alpha*dataMatrix.transpose()*error
+          return weights
+    ```
+
+4.  随机梯度上升法
+
+    ``` {.python}
+      def stocGradAscent(dataMatIn, classLabels, numIter = 150):
+          dataMatrix = mat(dataMatIn)
+          m, n = shape(dataMatrix)
+          weights = ones((n,1))
+          for j in range(numIter):
+              dataIdx = list(range(m))
+              for i in range(m):
+                  alpha = 4/(1.0+i+j) + 0.01
+                  randIdx = int(random.uniform(0, len(dataIdx)))
+                  h = sigmoid(sum(dataMatrix[randIdx]*weights))
+                  error = classLabels[randIdx] - h
+                  weights = weights + alpha*error*dataMatrix[randIdx].transpose()
+                  del(dataIdx[randIdx])
+          return weights
+    ```
+
+5.  图示 注意，输入的参数 'weights' 需要转为 `array` 格式
+
+    ``` {.python}
+      def plotBestFit(weights):
+          import matplotlib.pyplot as plt
+          dataMat, labelMat = loadDataSet()
+          dataArr = array(dataMat)
+          n = shape(dataArr)[0]
+          xcord1 = []; ycord1 = []
+          xcord2 = []; ycord2 = []
+          for i in range(n):
+              if int(labelMat[i]) == 1:
+                  xcord1.append(dataArr[i, 1]); ycord1.append(dataArr[i, 2])
+              else:
+                  xcord2.append(dataArr[i, 1]); ycord2.append(dataArr[i, 2])
+
+          fig = plt.figure()
+          ax = fig.add_subplot(111)
+          ax.scatter(xcord1, ycord1, s=30, c='red', marker='s')
+          ax.scatter(xcord2, ycord2, s=30, c='green')
+          x = arange(-3.0, 3.0, 0.1)
+          y = (-weights[0]-weights[1]*x)/weights[2]
+
+          ax.plot(x, y)
+          plt.xlabel('X1'); plt.ylabel('X2')
+          plt.show()
+    ```
+
+
