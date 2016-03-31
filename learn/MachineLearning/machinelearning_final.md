@@ -1162,9 +1162,8 @@ $(X1, X2, Z)$ 的分布也是确定的，如果我们设置 $Z$
         \end{equation}
     ```
 
-    下图是 `sigmoid` 函数随着 $Z$ 变化的变化
-    ![](figs/logistic_02.png) 可见，大尺度下， `sigmoid`
-    函数与阶跃函数非常接近。
+    下图是 `sigmoid` 函数随着 $Z$ 变化的变化 ![](figs/logistic_02.png)
+    可见，大尺度下， `sigmoid` 函数与阶跃函数非常接近。
 4.  对于上述函数 $C(Z)$ 我们也可以理解为 \$P(Z)\$， $P(Z)$
     对应类别为绿色圆点概率，如果使用 `sigmoid` 函数来表述 $P(Z)$
     的话，我们可以认为 $P(Z) > 0.5$ 对应绿色圆点， $P(Z) \leq 0.5$
@@ -1214,8 +1213,8 @@ $(X1, X2, Z)$ 的分布也是确定的，如果我们设置 $Z$
 
 于是，从一点 A
 出发，每次都取一个局域足够小的点沿着梯度方向移动，我们就可以得到函数
-$F(Z)$ 的最大值。 具体过程可以见下图： ![](figs/logistic_03.png)
-综上， 对于体系形式可以用下式表示的目标函数
+$F(Z)$ 的最大值。 具体过程可以见下图： ![](figs/logistic_03.png) 综上，
+对于体系形式可以用下式表示的目标函数
 
 ``` {.latex}
   \begin{equation}
@@ -1414,4 +1413,120 @@ $X2$ 和分类信息(1或者0)。 需要利用 `Logistic`
           plt.show()
     ```
 
+#### 场景二 从疝气病症预测病马的死亡率
+
+一共两个数据集， 'horseColicTest.txt' 和
+'horseColicTraning.txt'，分别是测试集与训练集
+
+##### 关于数据缺失的处理
+
+###### 普遍做法
+
+数据缺失时，可以采取的办法：
+
+1.  使用可用特征的均值来填补缺失值
+2.  使用特殊值来填补缺失值，如 -1
+3.  忽略有缺失值的样本
+4.  使用相似样本的均值填补缺失值
+5.  使用另外的机器学习算法预测缺失值
+
+###### 对本场景做法
+
+1.  对于本例的处理方式而言，不允许出现缺失值，一个比较好的选择是用 0
+    替代缺失值，这样的好处是
+
+函数 `sigmoid()` 在 0 点取值
+0.5，对结果的预测不具备任何倾向性，因此不会对误差项造成 任何影响。
+
+1.  如果数据中有条目类别标签缺失，舍弃该条目
+
+##### 考虑
+
+1.  数据导入，处理方式与场景一几乎一致，由于文本中的列太多，22列信息，对
+    `loadDataSet` 作 更新如下：
+
+    ``` {.python}
+      from numpy import *
+
+      def loadDataSet(fileName):
+          dataMat = []; labelMat = []
+          # fileName = 'horseColicTraining.txt'
+          fr = open(fileName)
+          for line in fr.readlines():
+              currArr = line.strip().split()
+              lineFeatArr = []
+              for i in range(21):
+                  lineFeatArr.append(float(currArr[i]))
+              dataMat.append(lineFeatArr)
+              labelMat.append(float(currArr[21]))
+          # 这里注意：返回的 dataMat 是array类型，实际书中没有指定类型，会导致后面随机梯度上升法
+          # 中对 dataMat 处理出问题
+          return array(dataMat), labelMat
+    ```
+
+2.  定义 `sigmoid` 函数，做法与场景一完全相同
+3.  随机梯度上升法，类似场景一的做法
+
+    ``` {.python}
+      def stocGradAscent(dataMatIn, labelMatIn, numIters = 150):
+          m, n = shape(dataMatIn)
+          weights = ones((n, 1))
+          for i in range(numIters):
+              dataIdx = list(range(m))
+              for j in range(m):
+                  alpha = 4.0/(1.0+i+j) + 0.001
+                  randIdx = int(random.uniform(0, len(dataIdx)))
+                  h = sigmoid(sum(dataMatIn[randIdx]*weights))
+                  error = labelMatIn[randIdx] - h
+                  weights = weights + alpha*error*dataMatIn[randIdx]
+                  del(dataIdx[randIdx])
+          return weights
+    ```
+
+    ``` {.example}
+    None
+    ```
+
+4.  对输入测试条目分类
+
+    ``` {.python}
+      def classifyVector(inX, weights):
+          prob = sigmoid(sum(inX*weights))
+          if prob > 0.5: return 1.0
+          else: return 0.0
+    ```
+
+5.  测试代码
+
+    ``` {.python}
+      def colicTest():
+          fileTraining = 'horseColicTraining.txt'
+          fileTest = 'horseColicTest.txt'
+          traingSet = []; traingLabels = []
+          testSet = []; testLabels = []
+          trainingSet, trainingLabels = loadDataSet(fileTraining)
+          testSet, testLabels = loadDataSet(fileTest)
+
+          trainingWeights = stocGradAscent(trainingSet, trainingLabels, 500)
+          errorCount = 0; numTestVec = 0.0
+
+          for i in range(testSet.shape[0]):
+              label = classifyVector(testSet[i], array(trainingWeights))
+              if label != testLabels[i]:
+                  errorCount += 1.0
+
+          errorRate = errorCount/float(testSet.shape[0])
+          return errorRate
+          print('error rate of this test is: %f' %errorRate)
+    ```
+
+6.  多次测试
+
+    ``` {.python}
+      def muliTest():
+          numTests = 10; errorSum = 0.0
+          for k in range(numTests):
+              errorSum += colicTest
+          print('after %d iterations the average error rate is: %f'%(numTests, errorsSum/float(numTests)))
+    ```
 
