@@ -1,0 +1,23 @@
+#+TITLE: 支持向量机
+#+AUTHOR: 胡琛
+
+* 概述 
+支持向量机 (support vector machines, =SVM=) 是一种二类分类模型，基本模型是定义在特征空间上的间隔最大
+的线性分类器。支持向量机还包括核技巧，使其称为实质上的非线性分类器。支持向量机的学习策略就是间隔最大化，可
+形式化为一个求解凸二次规划 (convex quadratic programming) 的问题，也等价于正则化的合页损失函数的最小
+化问题。支持向量机的学习算法是求解凸二次规划的最优化算法。
+
+支持向量机学习方法包括构建由简至繁的模型：
+1. 线性可分支持向量机 (linear support vector machine in linearly separable case)
+   训练数据可分时，通过硬间隔最大化 (hard margin maximization), 学习一个线性的分类器
+2. 线性支持向量机 (linear support vector machine)
+   训练数据近似线性可分时，通过软间隔最大化 (soft margin maximization), 也学习一个线性分类器
+3. 非线性支持向量机 (non-linear support vector machine)
+   当训练数据不可分时，通过使用核技巧 (kernel trick) 以及软间隔最大化，学习非线性支持向量机
+
+当输入空间为欧式空间或离散集合、特征空间为希尔伯特空间时，核函数 (kernel function) 表示将输入从输入
+空间映射到特征空间，得到的特征向量之间的内积。通过使用核函数，可以学习非线性支持向量机，等价于隐式地
+在高维的特征空间中学习线性支持向量机。这样的方法被称为核技巧。核方法 (kernel method) 是比支持向量机
+更为一般的机器学习方法。
+
+* 线性可支持向量机与硬间隔最大化

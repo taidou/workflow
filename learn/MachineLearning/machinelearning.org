@@ -1678,6 +1678,7 @@ $C$ 是两者的调和系数，此时，线性不可分的线性支持向量机�
     \end{align}
   \end{subequations}
 #+END_SRC
+
 * Footnotes
 
 [fn:4] 可见附录4说明，拉格朗日对偶性
