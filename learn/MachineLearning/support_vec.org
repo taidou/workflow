@@ -177,13 +177,15 @@ $x_i \in \mathcal{X} = R^n, y_i \in \mathcal{Y}={+1, -1}, i=1,2,\ldots,N$ ;
 输出：最大间隔分离超平面和分类决策函数。
 
 1) 构造并求解约束最优化问题：
+
+   #+NAME: eq:originquestion
      \begin{eqnarray}
-       \min_{\omega, b} && \frac{1}{2}||\omega||^2\\
+       \min_{\omega, b} && \frac{1}{2}||\omega||^2\\\nonumber
        s.t. && y_i (\omega \cdot x_i + b) -1 \geq 0, i = 1,2,\ldots,N
      \end{eqnarray}
    求得最优解 $\omega^{\ast}, b^{\ast}$
 
-2) 由此得到分离超平面
+3) 由此得到分离超平面
      \begin{equation}
        \omega^{\ast} \cdot x + b^{\ast} = 0
      \end{equation}
@@ -192,7 +194,7 @@ $x_i \in \mathcal{X} = R^n, y_i \in \mathcal{Y}={+1, -1}, i=1,2,\ldots,N$ ;
        f(x) = sign(\omega^{\ast}\cdot{}x+b^{\ast})
      \end{equation}
 
-3) 可以证明，最大间隔分离超平面存在且唯一
+4) 可以证明，最大间隔分离超平面存在且唯一
 
 *** 支持向量与间隔边界
 1. 支持向量
@@ -248,8 +250,8 @@ $x_i \in \mathcal{X} = R^n, y_i \in \mathcal{Y}={+1, -1}, i=1,2,\ldots,N$ ;
 
       假设 $f(x)$ ， $c_i(x)$ ， $h_j(x)$ 是定义在 ${\rm R}^n$ 上的连续可微函数，考虑约束最优化问题
         \begin{eqnarray}
-            \min_{x\in{}{\rm R}^n} & &f(x)\\
-            s.t. & &c_i(x) \leq 0, i= 1,2,\ldots, k\\
+            \min_{x\in{}{\rm R}^n} & &f(x)\\\nonumber
+            s.t. & &c_i(x) \leq 0, i= 1,2,\ldots, k\\\nonumber
             & &h_j(x) = 0, j = 1,2,\ldots, l
         \end{eqnarray}
       称此问题为原始最优化问题或者原始问题。
@@ -300,6 +302,7 @@ $x_i \in \mathcal{X} = R^n, y_i \in \mathcal{Y}={+1, -1}, i=1,2,\ldots,N$ ;
       可以将广义拉格朗日函数的极大极小问题表示为约束最优化问题：
         \begin{eqnarray}
           \max_{\alpha,\beta} \theta_D(\alpha, \beta) &=& \max_{\alpha,\beta} \min_{x}L(x,\alpha,\beta)\\
+          \nonumber
           s.t. && \alpha_i \geq 0, i = 1,2,\ldots,k
         \end{eqnarray}
       称为原始问题的对偶问题，定义对偶问题的最优值
@@ -331,15 +334,33 @@ $x_i \in \mathcal{X} = R^n, y_i \in \mathcal{Y}={+1, -1}, i=1,2,\ldots,N$ ;
      约束 $c_i(x)$ 是严格可行的，则 $x^{\ast}, \alpha^{\ast}, \beta^{\ast}$ 分别是原始问题和对偶问题
      的解的充分必要条件是 $x^{\ast}, \alpha^{\ast}, \beta^{\ast}$ 必须满足下面的 KKT 条件：
        \begin{eqnarray}
-         \nabla_{x}L(x^{\ast}, \alpha^{\ast}, \beta^{\ast}) & = & 0\\
-         \nabla_{\alpha}L(x^{\ast}, \alpha^{\ast}, \beta^{\ast}) & = & 0\\
-         \nabla_{\beta}L(x^{\ast}, \alpha^{\ast}, \beta^{\ast}) & = & 0\\
-         \alpha^{\ast}c_i(x^{\ast}) =0,&& i = 1,2,\ldots,k\\
-         c_i(x^{\ast}) \leq 0,&& i = 1,2,\ldots,k\\
-         \alpha_{i}^{\ast} \geq 0 ,&& i = 1,2,\ldots,k\\
+         \nabla_{x}L(x^{\ast}, \alpha^{\ast}, \beta^{\ast}) & = & 0\\\nonumber
+         \nabla_{\alpha}L(x^{\ast}, \alpha^{\ast}, \beta^{\ast}) & = & 0\\\nonumber
+         \nabla_{\beta}L(x^{\ast}, \alpha^{\ast}, \beta^{\ast}) & = & 0\\\nonumber
+         \alpha^{\ast}c_i(x^{\ast}) =0,&& i = 1,2,\ldots,k\\\nonumber
+         c_i(x^{\ast}) \leq 0,&& i = 1,2,\ldots,k\\\nonumber
+         \alpha_{i}^{\ast} \geq 0 ,&& i = 1,2,\ldots,k\\\nonumber
          h_{j}(x^{\ast}) = 0 ,&& i = 1,2,\ldots,l
        \end{eqnarray}
-2.
+2. 利用对偶问题求解原始问题的最优解
+
+   1) 构建拉格朗日函数
+
+      对原始问题 (式 [[eq:originquestion]]) 中每个不等式约束引入拉格朗日乘子 (Lagrange multiplier)
+      $\alpha_i \geq 0, i=1,2,\ldots,N$ ，定义拉格朗日函数：
+        \begin{equation}
+          L(\omega, b, a) = \frac{1}{2}||\omega||^2-\sum^{N}_{i=1}\alpha_iy_i(\omega\cdot{}x_i+b)
+      + \sum^{N}_{i=1}\alpha_i
+      \end{equation}
+      其中， $\alpha=(\alpha_1, \alpha_2, \ldots, \alpha_N)^T$ 为拉格朗日乘子向量。
+
+   2) 原始问题的对偶问题
+      由之前讨论可知，与原始问题等价的极小极大问题是：
+      #+BEGIN_SRC latex
+        \begin{equation}
+        \min_{x,\omega} \max_{\alpha}
+        \end{equation}
+      #+END_SRC
 
 * Footnotes
 
