@@ -333,6 +333,7 @@ $x_i \in \mathcal{X} = R^n, y_i \in \mathcal{Y}={+1, -1}, i=1,2,\ldots,N$ ;
      定理 3：对原始问题和对偶问题，假设 $f(x)$ 和 $c_i(x)$ 是凸函数， $h_j(x)$ 是仿射函数，并且不等式
      约束 $c_i(x)$ 是严格可行的，则 $x^{\ast}, \alpha^{\ast}, \beta^{\ast}$ 分别是原始问题和对偶问题
      的解的充分必要条件是 $x^{\ast}, \alpha^{\ast}, \beta^{\ast}$ 必须满足下面的 KKT 条件：
+     #+NAME: eq:dualbestques
        \begin{eqnarray}
          \nabla_{x}L(x^{\ast}, \alpha^{\ast}, \beta^{\ast}) & = & 0\\\nonumber
          \nabla_{\alpha}L(x^{\ast}, \alpha^{\ast}, \beta^{\ast}) & = & 0\\\nonumber
@@ -348,6 +349,8 @@ $x_i \in \mathcal{X} = R^n, y_i \in \mathcal{Y}={+1, -1}, i=1,2,\ldots,N$ ;
 
       对原始问题 (式 [[eq:originquestion]]) 中每个不等式约束引入拉格朗日乘子 (Lagrange multiplier)
       $\alpha_i \geq 0, i=1,2,\ldots,N$ ，定义拉格朗日函数：
+
+      #+NAME: eq:lagrangeorigin
         \begin{equation}
           L(\omega, b, a) = \frac{1}{2}||\omega||^2-\sum^{N}_{i=1}\alpha_iy_i(\omega\cdot{}x_i+b)
       + \sum^{N}_{i=1}\alpha_i
@@ -356,17 +359,182 @@ $x_i \in \mathcal{X} = R^n, y_i \in \mathcal{Y}={+1, -1}, i=1,2,\ldots,N$ ;
 
    2) 原始问题的对偶问题
       由之前讨论可知，与原始问题等价的极小极大问题是：
-      #+BEGIN_SRC latex
         \begin{equation}
-        \min_{x,\omega} \max_{\alpha}
+        \min_{\omega,b} \max_{\alpha} L(\omega, b, \alpha)
         \end{equation}
-      #+END_SRC
+      与之对偶的极大极小问题是：
+        \begin{equation}
+          \max_{\alpha}\min_{\omega,b} L(\omega, b, \alpha)
+        \end{equation}
 
+      考虑到 $\frac{1}{2}||\omega||^2$ 和 $-y_i(\omega\cdot{}x_i+b)+1$ 均为凸函数，满足定理 2 的条件，
+      我们知道，原始问题与对偶问题的解是存在的。下面对原始问题的对偶问题进行转换：
+      1. 求 $\min_{\omega, b} L(\omega, b, \alpha)$
+           \begin{eqnarray*}
+             \nabla_{\omega}L(\omega,b,\alpha) &=& \omega - \sum^{N}_{i=1}\alpha_iy_ix_i = 0\\
+             \nabla_{b}L(\omega,b,\alpha) &=& \sum^{N}_{i=1}\alpha_iy_i = 0
+           \end{eqnarray*}
+         有：
+           \begin{eqnarray}
+             \omega & = & \sum^{N}_{i=1}\alpha_iy_ix_i\\\nonumber
+             \sum^{N}_{i=1}\alpha_iy_i &=& 0
+           \end{eqnarray}
+        将上式代入拉格朗日函数 [[eq:lagrangeorigin]] 可以得到：
+          \begin{align*}
+            L(\omega, b, \alpha) &= \frac{1}{2}\sum^{N}_{i=1}\sum^{N}_{j=1}\alpha_i\alpha_jy_iy_j
+            (x_i\cdot{}x_j) + \sum^N_{i=1}\alpha_i\\\nonumber
+            {} & = -\frac{1}{2}\sum^{N}_{i=1}\sum^{N}_{j=1}\alpha_i\alpha_jy_iy_j(x_i\cdot{}x_j)
+            +\sum^N_{i=1}\alpha_i
+         \end{align*}
+        即：
+          \begin{equation}
+            \min_{\omega,b,\alpha} =
+         -\frac{1}{2}\sum^{N}_{i=1}\sum^{N}_{j=1}\alpha_i\alpha_jy_iy_j(x_i\cdot{}x_j)
+         +\sum^N_{i=1}\alpha_i
+          \end{equation}
+      2. 求 $\min_{\omega,b}L(\omega,b,\alpha)$ 对 $\alpha$ 的极大，即是对偶问题
+           \begin{eqnarray}
+             \max_{\laph}&&-\frac{1}{2}\sum^{N}_{i=1}\sum^{N}_{j=1}\alpha_i\alpha_jy_iy_j(x_i\cdot{}x_j)
+                    +\sum^N_{i=1}\alpha_i\\\nonumber
+             s.t. && \sum^N_{i=1}\alpha_iy_i = 0\\\nonumber
+             &&\alpha_i \geq 0, i=1,2,\ldots,N
+           \end{eqnarray}
+         将上式问题转为取极小，可以得到下面的等价的最优化问题：
+           \begin{eqnarray}
+             \min_{\laph}&&\frac{1}{2}\sum^{N}_{i=1}\sum^{N}_{j=1}\alpha_i\alpha_jy_iy_j(x_i\cdot{}x_j)
+                    -\sum^N_{i=1}\alpha_i\\\nonumber
+             s.t. && \sum^N_{i=1}\alpha_iy_i = 0\\\nonumber
+             &&\alpha_i \geq 0, i=1,2,\ldots,N
+           \end{eqnarray}
+
+   于是，设 $\alpha^{\ast} = (\alpha_{1}^{\ast}, \alpha_{2}^{\ast},\ldots,\alpha_{N}^{\ast})^T$ 是
+   对偶最优化问题 [[eq:dualbestques]] 的解，由 $\alpha^{\ast}$ 可以求出原始最优化问题 [[eq:convquapro]] 的解
+   $\omega^{\ast}$ 和 $b^{\ast}$ ，并且有如下定理：
+   定理 4[fn:6]：设 $\alpha^{\ast}$ 是对偶最优化问题的解，则存在下标 $j$ ，使得 $\alpha_{j}^{\ast} > 0$ ，
+   并可按下式求得原始最优化问题的解 $\omega^{\ast}, b^{\ast}$ ：
+     \begin{eqnarray}
+       \omega^{\ast} &=& \sum^{N}_{i=1}\alpha_{i}^{\ast}y_ix_i\\\nonumber
+       b^{\ast} &=& y_j - \sum^{N}_{i=1}\alpha^{\ast}y_i(x_i\cdot{}x_j)
+     \end{eqnarray}
+3. 总结
+
+   算法 2：线性可分支持向量机学习算法
+
+   输入： 线性可分训练集 $T={(x_1,y_1), (x_2,y_2), \ldots, (x_N, y_N)}$ ，其中
+   $x_i\in{}\mathcal{X}={\bm R}^n, y_i\in{}\mathcal{Y}={+1, -1}, i=1,2,\ldots,N$ ；
+
+   输出：分离超平面和分类决策函数
+
+   1) 构造并求解约束最优化问题：
+        \begin{eqnarray*}
+          \min_{\laph}&&\frac{1}{2}\sum^{N}_{i=1}\sum^{N}_{j=1}\alpha_i\alpha_jy_iy_j(x_i\cdot{}x_j)
+                         -\sum^N_{i=1}\alpha_i\\
+          s.t. && \sum^N_{i=1}\alpha_iy_i = 0\\
+                      &&\alpha_i \geq 0, i=1,2,\ldots,N
+        \end{eqnarray*}
+      求解最优解 $\alpha^{\ast} = (\alpha^{\ast}_1,\alpha^{\ast}_2,\ldots,\alpha^{\ast}_N)^T$
+
+   2) 计算
+        \begin{equation*}
+          \omega^{\ast} = \sum^{N}_{i=1}\alpha^{\ast}_iy_ix_i
+        \end{equation*}
+      并选择 $\alpha^{\ast}$ 的一个正分量 $\alpha^{\ast}_j > 0$ ，计算
+        \begin{equation*}
+          b^{\ast} = y_j - \sum^{N}_{i=1}\alpha^{\ast}_iy_i(x_i\cdot{}x_j)
+        \end{equation*}
+
+   3) 求得分离超平面
+        \begin{equation*}
+          \omega^{\ast}\cdot{}x+b^{\ast} = 0
+        \end{equation*}
+      分离决策函数：
+        \begin{equation*}
+          f(x) = sign(\omega^{\ast}\cdot{}x+b^{\ast})
+        \end{equation*}
+
+   4) 定义(支持向量)： 从上式可以看出， $\omega^{\ast}$ 和 $b^{\ast}$ 只依赖于训练数据中
+      $\alpha^{\ast}_i > 0$ 的点，我们将训练数据中对应 $\alpha^{\ast}_i > 0$ 的实例点
+      ($\alpha^{\ast}_i\in{}{\rm R}^n$)称为支持向量。
+
+      根据这一定义，支持向量一定位于间隔边界上。因为由 KKT 互补条件：
+        \begin{equation*}
+          \alpha^{\ast}_i(y_i(\omega^{\ast}\cdot{}x_i+b^{\ast}) -1) = 0, i = 1,2,\ldots,N
+        \end{equation*}
+      可知，若 $\alpha^{\ast}_i > 0$ ，则对应实力 $x_i$ 有：
+        \begin{equation*}
+          y_i(\omega^{\ast}\cdot{}x_i+b)-1=0
+        \end{equation*}
+      或
+        \begin{equation*}
+          \omega^{\ast}\cdot{}x_i+b=\pm 1
+        \end{equation*}
+4. 举例
+   已知数据集正例点为 $x_1=(3,3)^{T}$, $x_2=(4,3)^{T}$ , 负例点为 $x_3=(1,1)^{T}$ ，试求最大间隔分离超
+   平面。
+
+   解：
+   1） 构造数据集约束最优化问题：
+        \begin{eqnarray*}
+            \min_{\alpha}: && \frac{1}{2}\sum^{N}_{i=1}\sum^{N}_{i=1}\alpha_i\alpha_jy_iy_j
+            (x_i\cdot{}x_j) - \sum^N_{i=1}\alpha_i\\\nonumber
+            && = \frac{1}{2}18\alpha^2_1+25\alpha^2_2+2\alpha^2_3+42\alpha_1\alpha_2-
+            12\alpha_1\alpha_3-14\alpha_2\alpha_3)
+              -\alpha_1-\alpha_2-\alpha_3\\\nonumber
+            s.t. && \alpha_1+\alpha_2-\alpha_3 = 0\\\nonumber
+            && \alpha_i\geq 0, i = 1,2,3
+        \end{eqnarray*}
+   2） 解最优化问题，将 $\alpha_3=\alpha_1+\alpha2$ 带入目标函数并记为
+        \begin{equation}
+          s(\alpha_1,\alpha_2) = 4\alpha^2_1+\frac{13}{2}\alpha^2_2+10\alpha_1\alpha_2-2\alpha_1
+          -2\alpha_2
+        \end{equation}
+       对 $\alpha_1, \alpha_2$ 分别求偏导并令其为 0，可以知道 $s(\alpha_1, \alpha_2)$ 在点
+       $(\frac{3}{2}, -1)^T$ 取极值，但是该点的 $\alpha_2$ 不满足约束 $\alpha_i \geq 0$ ，所以最小值
+       应在边界上达到：
+       + 当 $\alpha_1 = 0$ 时，最小值 $s(0, \frac{2}{13}) = -\frac{2}{13}$ ；当 $\alpha_2=0$ 时，相应
+         的 $s(\frac{1}{4}, 0) = -\frac{1}{4}$ ，于是，在 $\alpha_1=\frac{1}{4}, \alpha_2=0$ 时，
+         $s$ 达到最小值，此时 $\alpha_3 = \frac{1}{4}$
+       + $\alpha^{\ast}_1=\alpha^{\ast}_3=\frac{1}{4}$ 对应的实例点 $x_1, x_3$ 为支持向量，此时
+            \begin{equation*}
+              \omega^{\ast}_1=\omega^{\ast}_2=\frac{1}{2} & b^{\ast} = -2
+            \end{equation*}
+          于是，分离超平面为：
+            \begin{equation*}
+              \frac{1}{2}x^{(1)}+\frac{1}{2}x^{(2)} - 2 = 0
+            \end{equation*}
+          分类决策函数为
+            \begin{equation*}
+              f(x) = \frac{1}{2}x^{(1)}+\frac{1}{2}x^{(2)} - 2
+            \end{equation*}
+
+* 线性支持向量机与软间隔最大化
+
+** 线性支持向量机
+通常情况下，训练数据不是简单的可分数据集，而是有一些特异点 (outlier)，当将这些特异点除去后，剩下的大
+部分样本点组成的集合是线性可分的。
+
+对类似训练样本的每个样本点 $(x_i,y_i)$ 引入一个松弛变量 $\xi_i\geq{}0$ ，使函数间隔加上松弛变量大于
+等于 1。这样，约束条件变为：
+  \begin{equation}
+    y_i(\omega\cdot{}x_i+b)\geq 1 - \xi_i
+  \end{equation}
+同时，对每个松弛变量 $\xi_i$ ，支付一个代价 $\xi_i$ ，目标函数由原来的 $\frac{1}{2}||\omega||^2$ 变
+为
+  \begin{equation}
+    \frac{1}{2}||\omega||^2+C\sum^{N}_{i=1}\xi_i
+  \end{equation}
+这里， $C>0$ 称为惩罚参数，一般由应用问题决定， $C$ 值大的时候对误分类的惩罚增大，反之则减小。最小化
+目标函数包含两层意思：使 $\frac{1}{2}||\omega||^2$ 尽可能小以使最大间隔尽可能大，同时使得误分类点的
+个数尽可能少， $C$ 是调和两者的系数。
 * Footnotes
+
+[fn:6] 利用 KKT 条件， $\nabla_{\omega} L(\omega^{\ast}, b^{\ast}, \alpha^{\ast}) = \nabla_{b} L = 0$
+可以求出 $\omega^{\ast}$ ，代入 $\alpha_{i}^{\ast}(y_i(\omega^{\ast}\cdot{}x_i+b^{\ast})-1=0$
+可以求出 $b^{\ast}$ 。
 
 [fn:5] 简单而言，仿射函数是指一阶多项式组成的函数，譬如 $y = ax+b$ 。
 
-[fn:4] 简单从理解上讲， $f^{\prime\prime}(x) > 0$ 对应凹函数， $f^{\prime\prime}(x) < 0$ 对应凸函数。
+[fn:4] 简单从理解上讲， $f^{\prime\prime}(x) \geq 0$ 对应凸函数， $f^{\prime\prime}(x) < 0$ 对应凹函数。
 
 [fn:3] 最大化 $\frac{1}{|x|}$ 等价于最小化 $|x|$ 等价于最小化 $\frac{1}{2}|x|^2$ 。
 
