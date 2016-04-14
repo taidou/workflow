@@ -655,6 +655,111 @@ $\xi_i = 0$ ；若 $\alpha^{\ast}_i = C$ ， $0 < \xi_i < 1$ ，则分类正确�
     \min_{\omega,b} && \sum^{N}_{i=1}[1-y_i(\omega\cdot{}x_i+b)]_++\lambda||\omega||^2
   \end{eqnarray*}
 
+* 核函数
+
+** 核技巧
+如下图所示，通过非线性变换，将非线性问题转变为线性问题，这样的方法属于核技巧。
+
+[[./figs/supvector_05.jpg]]
+
+设原空间为 $\mathcal{X}\subset{}{\rm R}^2, x=(x_1,x_2)^T\in{}\mathcal{X}$ ，新空间为
+$\mathcal{Z}\subset{}{\rm R}^2, z=(z_1, z_2)^T\in{}\mathcal{Z}$ ，定义从原空间到新空间的变换：
+  \begin{equation*}
+    z=\phi(x)=((x^{(1)})^2, (x^{(2)})^2)^T
+  \end{equation*}
+经过变换 $z=\phi(x)$ ，原空间 $\mathcal{X}\subset{}{\rm R}^2$ 变换为新空间
+$\mathcal{Z}\subset{}{\rm R}^2$ ，原空间中的点相应地变换为新空间中的点，原空间中的椭圆
+  \begin{equation*}
+    \omega_1(x^{(1)})^2+\omega_2(x^{(2)})^2+b=0
+  \end{equation*}
+变换为新空间中的直线
+  \begin{equation*}
+      \omega_1z^{(1)} + \omega_2z^{(2)} + b = 0
+  \end{equation*}
+在新变换空间中，直线 $\omega_1z^{(1)} + \omega_2z^{(2)} + b = 0$ 将变换后的正负例点正确分开。这样，
+原空间的非线性可分问题就转变为新空间中的线性可分问题。
+
+总结上例，用线性方法求解非线性问题分为两步 (核技巧)：
++ 使用一个变换将原空间中的数据映射到新空间
++ 在新空间用线性可分学习方法从训练数据中学习分类模型
+
+定义 (核函数)：设 $\mathcal{X}$ 是输入空间 (欧氏空间 ${\rm R}^n$ 的子集或离散集合)，又设
+$\mathcal{H}$ 是特征空间 (希尔伯特空间)，如果存在一个从 $\mathcal{X}$ 到 $\mathcal{H}$ 的映射
+  \begin{eqnarray*}
+    \phi(x): && \mathcal{X} \to \mathcal{H}
+  \end{eqnarray*}
+使得对所有 $x,z \in \mathcal{X}$ ，函数 $K(x,z)$ 满足条件
+  \begin{equation*}
+    K(x,z) = \phi(x)\cdot{}\phi(z)
+  \end{equation*}
+则称 $K(x,z)$ 为核函数， $\phi(x)$ 为映射函数， 式中 $\phi(x)\cdot{}\phi(z)$ 为 $\phi(x)$ 和
+$\phi(z)$ 的内积。
+
+在线性支持向量机中，无论是目标函数还是决策函数都只涉及输入实例与实例之间的内积。在对偶问题的目标函数
+中，内积 $x_i\cdot{}x_j$ 可以用核函数 $K(x_i, x_j) = \phi(x_i)\cdot{}\phi(x_j)$ 代表，此时，对偶问题
+的目标函数变为：
+  \begin{equation*}
+    W(\alpha) = \frac{1}{2}\sum^{N}_{i=1}\sum^{N}_{j=1}\alpha_i\alpha_jy_iy_jK(x_i, x_j)
+                           -\sum^N_{i=1}\alpha_i
+  \end{equation*}
+同样，分类觉得函数中的内积也可以用核函数代替，于是，分类决策函数变为
+  \begin{equation*}
+    f(x) = sign(\sum^{N}_{i=1}\alpha^{\ast}y_i\phi(x_i)\cdot{}\phi(x)+b^{\ast})
+    = sign(\sum^{N}_{i=1}\alpha_i^{\ast}y_iK(x_i, x)+b^{\ast})
+  \end{equation*}
+
+** 常用核函数                                          :not fully understand:
+1. 多项式核函数 (polynomial kernel function)
+    \begin{equation}
+        K(x,z) = (x\cdot{}z+1)^p
+    \end{equation}
+   对应的支持向量机是一个 $p$ 次多项式分类器，在此情形下，分类决策函数成为：
+      \begin{equation}
+        f(x) = sign(\sum^{N_S}_{i=1}\alpha_i^{\ast}y_i(x_i\cdot{}x)^p+b^{\ast})
+      \end{equation}
+2. 高斯核函数 (Gaussian kernel function)
+    \begin{equation}
+      K(x,z) = exp\left( -\frac{||x-z||^2}{2\sigma^2} \right)
+    \end{equation}
+   对应的支持向量机是高斯径向基函数 (radial basis function) 分类器。在此情形下，分类决策函数成为
+    \begin{equation}
+      f(x) = \sum^{N_s}_{i=1}sign\left(\alpha_i^{\ast}y_iexp\left( -\frac{||x-z||^2}{2\sigma^2}
+      \right)+b^{\ast}\right)
+    \end{equation}
+3. 字符串核函数
+考虑一个有限字符表 $\Sigma$ 。字符串 s 是从 $\Sigma$ 中取出的有限个字符的序列，包括空字符串。字符串
+s 的长度用 $|s|$ 表示，它的元素记做 $s(1)s(2)\ldots{}s(|s|)$ 。两个字符串的连接记做 $st$ ，所有长度
+为 $n$ 的字符串的集合记做 $\Sigma^{n}$ ，所有字符串的集合记做
+$\Sigma^{\ast}=\cup^{\infty}_{n=0}\Sigma^n$ 。
+
+考虑字符串 $s$ 的字串 $u$ ，给定一个指标序列
+$i=(i_1,i_2,\ldots,i_{|u}), 1 \leq i_1 < i_2 < \ldots < i_{|u|} \leq |s|$ ， $s$ 的字串定义为
+$u=s(i)=s(i_1)s(i_2)\ldots{}s(i_{|u|})$ ，其长度记做 $l(i)=i_{|u|}-i_1+1$ 。如果 $i$ 是连续的，则
+$l(i)=|u|$ ；否则， $l(i) > |u|$ 。
+
+假设 $\mathcal{S}$ 是长度大于或等于 $n$ 的字符串集合， $s$ 是 $\mathcal{S}$ 的元素，现在建立字符串集
+合 $S$ 到特征空间 $\mathcal{H}={\rm R}^{\Sigma^n}$ 的映射 $\phi_n(s)$ 。 ${\rm R}^{\Sigma^n}$ 表示定
+义在 $\Sigma^n$ 上的实数空间，其每一维对应一个字符串 $u\in{}\Sigma^n$ ，映射 $\phi_n(s)$ 将字符串
+$s$ 对应于空间 $R^{\Sigma^n}$ 的一个向量，其在 $u$ 上的取值为：
+  \begin{equation}
+    [\phi_n(s)]_u=\sum_{i;s(i)=u}\lambda^{l(i)}
+  \end{equation}
+这里， $ 0 < \lambda \leq 1$ 表示一个衰减参数， $l(i)$ 表示字符串 $i$ 的长度，求和在 $s$ 中所有与
+$u$ 相同的字串上进行。
+
+譬如，假设 $\Sigma$ 是应为字符集， $n$ 为 3， $\mathcal{S}$ 为长度大于等于 3 的字符串集合。考虑将字符
+集 $\mathcal{S}$ 映射到特征空间 $\mathcal{H}_3$ 。 $\mathcal{H}_3$ 的一维对应字符串 $asd$ 。这时，字
+符串 “Nasdaq” 与 “lass das” 在这一维上的值分别是 $[\phi_3(Nasdaq)]_{asd}=\lambda^3$ 和
+$[\phi_3(lass das)]_{asd}=2\lambda^5$ ，在第一个字符串里， $asd$ 是连续的字串，第二个字符串里，
+$asd$ 是长度为 5 的不连续字串，共出现 2 次。两个字符串 $s$ 和 $t$ 上的字符串核函数是基于映射 $\phi_n$ 的
+特征空间中的内积：
+  \begin{equation}
+   k_n(s,t) = \sum_{u\in{}\Sigma^n}[\phi_n(s)]_{u}[\phi_n(t)]_{u} =
+   \sum_{u\in{}\Sigma^n(i,j):}\sum_{s(i)=t(j)=u} \lambda^{l(i)}\lambda^{l(j)}
+  \end{equation}
+字符串核函数 $k_n(s,t)$ 给出了字符串 $s$ 和 $t$ 中长度等于 $n$ 的所有字串组成的特征向量的余弦相似度
+(cosine similarity) 。直观上，两个字符串相同的字串越多，他们越相似，字符串核函数的值就越大。字符串核
+函数可以由动态规划快速计算。
 
 * Footnotes
 
