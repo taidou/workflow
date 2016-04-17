@@ -826,14 +826,14 @@ $\alpha_3, \alpha_4,\ldots,\alpha_N$ 固定，那么由等式约束 $\sum^N_{i=1
 不失一般性，假设选择的两个变量是 $\alpha_1,\alpha_2$ ，其他变量 $\alpha_i(i=3,4,\ldots,N)$ 是固定的
 ，于是 =SMO= 的最优化问题 [[eq:smosolve]] 的子问题可以写成：
 #+NAME: eq:smoeg
-  \begin{eqnarray*}
+  \begin{eqnarray}
     \min_{\alpha_1, \alpha_2}&&\frac{1}{2}K_{11}\alpha_1^2+\frac{1}{2}K_{22}\alpha_2^2
                    + y_1y_2K_{12}\alpha_1\alpha_2\\\nonumber
     {}&&-(\alpha_1+\alpha_2)+y_1\alpha_1\sum^{N}_{i=3}y_i\alpha_iK_{i1}+
          y_2\alpha_2\sum^{N}_{i=3}y_i\alpha_iK_{i2}\\
     s.t. && \alpha_1y_1 + \alpha_2y_2 = -\sum^{N}_{i=3}y_i\alpha_i=\varsigma\\
                  && 0 \leq \alpha_i \leq C, i=1,2
-  \end{eqnarray*}
+  \end{eqnarray}
 
 1. 确定约束
    不等式约束 $0 \leq \alpha_i \leq C$ 使得 $\alpha_i,i=1,2$ 只能在盒子 $[0,C]\times{}[0,C]$ 范围内，等式约束
@@ -850,7 +850,127 @@ $\alpha_3, \alpha_4,\ldots,\alpha_N$ 固定，那么由等式约束 $\sum^N_{i=1
    $y_1 = y_2$ ，类似可以得到 $\alpha^{new}_2$ 的取值约束为：
    $L=max(0, \alpha^{old}_2+\alpha^{old}_1-C, H=min(C,\alpha^{old}_2+\alpha^{old}_1)$ 。
 2. 求沿着约束方向未经剪辑的 $\alpha^{new,unc}_2$
-3. 剪辑后 $\alpha^{new}_2$
+   记 $g(x) = \sum^N_{i=1} \alpha_iy_iK(x_j,x_i) + b$ ，令 $E_i = g(x_i) - y_i, i=1,2$ 。这样，当
+   $i=1,2$ 时， $E_i$ 为函数 $g(x)$ 对输入 $x_i$ 的预测值与真实输出 $y_i$ 之差。
+   定理 7：最优化问题 [[eq:smoeg]] 沿着约束方向未经剪辑时的解是：
+            \begin{equation}
+              \alpha_2^{new,unc}=\alpha_2^{old} + \frac{y_2(E_2-E_1)}{\eta}
+            \end{equation}
+          其中， $\eta = K_{11}+K_{22}-2K_{12}=||\Phi(x_1)-\Phi(x_2)||^2$ ， $\Phi(x)$ 是输入空间到特征空间
+          的映射。
+          经过剪辑后 $\alpha_2$ 的解是：
+            \begin{equation}
+              \alpha_2^{new} =
+              \begin{cases}
+                H & ,\alpha^{new,unc}_2 > H\\
+               \alpha^{new,unc}_2 & , L < \alpha^{new,unc}_2 < H\\
+               L & ,\alpha^{new,unc}_2 < L
+              \end{cases}
+            \end{equation}
+          由 $\alpha_2^{new}$ 求得 $\alpha_1^{new}$ 是：
+            \begin{equation}
+              \alpha_1^{new} = \alpha_1^{old} + y_1y_2(\alpha_2^{old} - \alpha_2^{new})
+            \end{equation}
+   求解过程只需要将 $\alpha_1y_1=\varsigma-\alpha_2y_2$ 与 $y_i^2=1$ 代入 [[eq:smoeg]] 中，并将目标函数
+   对 $\alpha_2$ 求导令其为 0 即可。
+
+** 变量的选择方法
+1. 第一个变量的选择
+   =SMO= 称选择第 1 个变量的过程为外层循环。外层循环在训练样本中选取违反 KKT 条件最严重的样本点，并将其对应
+   的变量作为第 1 个变量。具体地，检验训练样本点 $(x_i, y_i)$ 是否满足 KKT 条件，即：
+     \begin{eqnarray}
+       \alpha_i = 0 \Leftarrow y_ig(x_i) \geq 1\\
+       0 < \alpha_i < C \Leftarrow y_ig(x_i) = 1\\
+       \alpha_i = C \Leftarrow y_ig(x_i) \leq 1
+     \end{eqnarray}
+   其中， $g(x_i) = \sum^N_{j=1}\alpha_jy_jK(x_j, x_i) + b$
+
+   该检验是在 $\varepsilon$ 范围内进行的。在检验过程中，外层循环首先遍历所有满足条件 $0<\alpha_i<C$ 的
+   样本点，即在间隔边界上的支持向量点，检验它们是否满足 KKT 条件。如果这些样本点都满足 KKT 条件，那么遍
+   历整个训练集，检验它们是否满足 KKT 条件。
+
+2. 第 2 个变量的选择
+   =SMO= 算法称选择第 2 个变量的过程为内层循环。假设在外层循环中已经找到第 1 个变量 $\alpha_1$ ，现在要
+   在内层循环中找第 2 个变量 $\alpha_2$ ，第 2 个变量选择的标准是希望能使 $\alpha_2$ 有足够大的变化。
+
+   因为 $\alpha_2$ 的值依赖 $|E_1-E2|$ ，为了加快计算速度，一种简单的做法是选择 $\alpha_2$ ，使其对
+   应的 $|E_1-E2|$ 最大。因为 $\alpha_1$ 已经确定，此时的 $E_1$ 也相应的确定，于是，如果 $E_1$ 是正
+   的，那么选择负的绝对值最大的 $E_i$ 作为 $E_2$ ；如果 $E_1$ 是负的，那么选择正的最大的 $E_i$ 作为
+   $E_2$ 。
+
+   特殊情况下，如果内层循环通过以上方法找到的 $\alpha_2$ 不能使目标函数有足够的下降，那么采用以下启
+   发式规则继续选择 $\alpha_2$ ：遍历在间隔边界上的支持向量点，依次将其对应的变量作为 $\alpha_2$ 试
+   用，直到目标函数有足够的下降；若还是找不到合适的 $\alpha_2$ ，那么遍历训练数据集；如果依然找不到
+   合适的 $\alpha_2$ ，放弃第 1 个 $\alpha_1$ ，通过外层循环寻找另外的 $\alpha_1$ 。
+
+3. 计算阈值 $b$ 和差值 $E_i$
+   每次完成两个变量的优化后，都有重新计算阈值 $b$ 。当 $0<\alpha_1^{new} < C$ 时，由 KKT 条件可知：
+     \begin{equation}
+       \sum^N_{i=1}\alpha_iy_iK_{i1} + b = y_1
+     \end{equation}
+   于是，
+   #+NAME: eq:b1new
+     \begin{equation}
+       b_1^{new} = y_1-\sum^N_{i=3}\alpha_iy_iK_{i1} - \alpha_1^{new}y_iK_{11}-
+       \alpha^{new}_2y_2K_{21}
+     \end{equation}
+   由 $E_1$ 定义又有，
+   #+NAME: eq:e1def
+     \begin{equation}
+       E_1 = \sum^N_{i=1} \alpha_iy_iK_{i1} + \alpha^{old}_1y_1K_{11}+
+       \alpha_2^{old}y_2K_{21} + b^{old} - y_1
+     \end{equation}
+   上式可以改写为：
+     \begin{equation}
+       y_1 - \sum^N_{i=3}\alpha_iy_iK_{i1} = -E_1+\alpha_1^{old}y_1K_{11}
+       +\alpha_2^{old}y_2K_{21} + b^{old}
+     \end{equation}
+   代入 [[eq:b1new]] 中，可以得到：
+     \begin{equation}
+       b_1^{new} = -E_1- y_1K_{11}(\alpha_1^{new}-\alpha_1^{old})-
+       y_2K_{21}(\alpha^{new}_2-\alpha^{old}_2)+b^{old}
+     \end{equation}
+   同样地，如果 $0<\alpha^{new}_2<C$ ，那么，
+     \begin{equation}
+       b_2^{new} = -E_2- y_1K_{12}(\alpha_1^{new}-\alpha_1^{old})-
+       y_2K_{22}(\alpha^{new}_2-\alpha^{old}_2)+b^{old}
+     \end{equation}
+
+   每次完成两个变量优化后，还需要更新对应的 $E_i$ 值，并将它们保存在列表中， $E_i$ 值的更新需要用到
+   $b^{new}$ 值，以及所有支持向量对应的 $\alpha_j$ ：
+     \begin{equation}
+       E^{new}_i = \sum_Sy_j\alpha_jK(x_i,x_j)+b^{new}-y_i
+     \end{equation}
+   其中， $S$ 是所有支持向量 $x_j$ 的集合。
+
+** =SMO= 算法概略
+算法 5：(=SMO= 算法)
+
+输入：训练数据集 $T={(x_1,x_1), (x_2,y_2), \ldots, (x_N, y_N)}$ ，其中，
+$x_i\in{}\mathcal{X}={\rm R}^n, y_i\in{}\mathcal{Y}={+1, -1}, i=1,2,\ldots,N$ ，精度 $\epsilon$ ;
+
+输出：近似解 $\hat{\alpha}$ 。
+
+1. 取初值 $\alpha^{0} = 0$ ，令 $k=0$ ;
+2. 选取优化变量 $\alpha_1^{(k)}, \alpha_2^{(k)}$ ，解析求解两个变量的最优化问题 [[eq:smosolve]] ，求得最
+   优解 $\alpha_1^{(k+1)}, \alpha_2^{(k+1)}$ ，更新 $\alpha$ 为 $\alpha^{(k+1)}$ ；
+3. 若在求解精度 $\epsilon$ 范围内，满足停机条件：
+     \begin{eqnarray*}
+       \sum^N_{i=1}\alpha_iy_i &=& 0\\
+       0 \leq \alpha_i \leq C,&& i = 1,2,\ldots,N\\
+     \end{eqnarray*}
+     \begin{equation*}
+       y_i\cdot{}g(x_i) =
+       \begin{cases}
+         \geq 1, &{x_i|\alpha_i = 0}\\
+         = 1, &{x_i|0 < \alpha_i < C}\\
+         \leq 1, &{x_i|\alpha_i = C}
+       \end{cases}
+     \end{equation*}
+   其中， $g(x_i) = \sum\limits^N_{j=1}\alpha_jy_jK(x_j, x_i) + b$
+   那么就转 4，否则令 $k=k+1$ ，转 2
+4. 取 $\hat{\alpha} = \alpha^{(k+1)}$
+
 * Footnotes
 
 [fn:7] 设 $\mathcal{X}\subset{}{\bm R}^n$ ， $K(x,z)$ 是定义在 $\mathcal{X}\times{}\mathcal{X}$ 上的
